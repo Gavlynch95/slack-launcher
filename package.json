@@ -1,0 +1,15 @@
+{
+  "name": "slack-launcher",
+  "version": "1.0.0",
+  "description": "Multi-account Slack launcher with isolated sessions",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^33.0.0"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.10.0"
+  }
+}
