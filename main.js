@@ -1,4 +1,4 @@
-const { app, BrowserWindow, session, ipcMain, shell, net } = require('electron');
+const { app, BrowserWindow, session, ipcMain, shell, net, clipboard, screen } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
@@ -16,23 +16,23 @@ process.on('uncaughtException', (err) => {
 const SYNC_DIR = path.join(app.getPath('home'), '.slack-launcher');
 const SYNC_FILE = path.join(SYNC_DIR, 'jira-sync.json');
 
-const CHROME_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
+const CHROME_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 15_0_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.7871.47 Safari/537.36';
 
 const UA_OVERRIDE_SCRIPT = `
   // Spoof navigator.userAgentData
   Object.defineProperty(navigator, 'userAgentData', {
     get: () => ({
       brands: [
-        { brand: 'Chromium', version: '136' },
-        { brand: 'Google Chrome', version: '136' },
+        { brand: 'Chromium', version: '150' },
+        { brand: 'Google Chrome', version: '150' },
         { brand: 'Not-A.Brand', version: '99' }
       ],
       mobile: false,
       platform: 'macOS',
       getHighEntropyValues: () => Promise.resolve({
         brands: [
-          { brand: 'Chromium', version: '136' },
-          { brand: 'Google Chrome', version: '136' },
+          { brand: 'Chromium', version: '150' },
+          { brand: 'Google Chrome', version: '150' },
           { brand: 'Not-A.Brand', version: '99' }
         ],
         mobile: false,
@@ -41,12 +41,21 @@ const UA_OVERRIDE_SCRIPT = `
         architecture: 'arm',
         model: '',
         fullVersionList: [
-          { brand: 'Chromium', version: '136.0.0.0' },
-          { brand: 'Google Chrome', version: '136.0.0.0' },
+          { brand: 'Chromium', version: '150.0.7871.47' },
+          { brand: 'Google Chrome', version: '150.0.7871.47' },
           { brand: 'Not-A.Brand', version: '99.0.0.0' }
         ]
       })
     }),
+    configurable: true
+  });
+
+  Object.defineProperty(navigator, 'userAgent', {
+    get: () => '${CHROME_UA}',
+    configurable: true
+  });
+  Object.defineProperty(navigator, 'vendor', {
+    get: () => 'Google Inc.',
     configurable: true
   });
 
@@ -66,6 +75,7 @@ const UA_OVERRIDE_SCRIPT = `
   };
   window.chrome.csi = function() { return {}; };
   window.chrome.loadTimes = function() { return {}; };
+  void 0;
 `;
 
 let mainWindow;
@@ -89,6 +99,7 @@ app.on('ready', () => {
   // Inject overrides into every webview as early as possible
   app.on('web-contents-created', (event, contents) => {
     if (contents.getType() === 'webview') {
+      contents.setUserAgent(CHROME_UA);
       // Intercept new window requests and send to renderer for split-screen
       contents.setWindowOpenHandler(({ url }) => {
         mainWindow.webContents.send('open-in-split', url);
@@ -101,9 +112,17 @@ app.on('ready', () => {
     }
   });
 
+  const { workArea } = screen.getPrimaryDisplay();
+  const windowWidth = Math.min(1400, Math.max(1024, workArea.width - 80));
+  const windowHeight = Math.min(900, Math.max(720, workArea.height - 80));
+
   mainWindow = new BrowserWindow({
-    width: 1400,
-    height: 900,
+    width: windowWidth,
+    height: windowHeight,
+    x: Math.round(workArea.x + (workArea.width - windowWidth) / 2),
+    y: Math.round(workArea.y + (workArea.height - windowHeight) / 2),
+    minWidth: 1100,
+    minHeight: 720,
     titleBarStyle: 'hiddenInset',
     webPreferences: {
       nodeIntegration: false,
@@ -119,6 +138,11 @@ app.on('ready', () => {
   ipcMain.handle('open-external', async (event, url) => {
     console.log('open-external called with:', url);
     await shell.openExternal(url);
+  });
+
+  ipcMain.handle('clipboard-write', async (event, text) => {
+    clipboard.writeText(String(text || ''));
+    return { ok: true };
   });
 
   // Open project tracker in default browser (where user's data lives)

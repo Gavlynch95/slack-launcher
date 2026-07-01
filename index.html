@@ -6,597 +6,612 @@
   <title>Slack Launcher</title>
   <style>
     :root {
-      --sidebar-width: 260px;
-      --bg: #1a1a2e;
-      --sidebar-bg: #16213e;
-      --card-bg: #1f2b47;
-      --card-hover: #263554;
-      --text: #e2e8f0;
-      --text-dim: #94a3b8;
-      --accent: #38bdf8;
-      --accent-dim: #0ea5e9;
-      --border: #2d3f5f;
-      --green: #34d399;
-      --purple: #a78bfa;
-      --orange: #fb923c;
-      --pink: #f472b6;
-      --yellow: #fbbf24;
-      --red: #f87171;
+      --rail: 300px;
+      --titlebar: 0px;
+      --bg: #f4f2ee;
+      --panel: #ffffff;
+      --ink: #1f2933;
+      --muted: #667085;
+      --soft: #e5e1d8;
+      --line: #d8d5cf;
+      --dark: #14171c;
+      --dark-2: #20242b;
+      --dark-3: #2b3038;
+      --primary: #0f766e;
+      --primary-2: #14b8a6;
+      --compare: #b45309;
+      --danger: #dc2626;
+      --good: #059669;
+      --grid: #0f766e;
+      --plus: #7c3aed;
+      --shadow: 0 18px 50px rgba(31, 41, 51, 0.16);
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-
+    * { box-sizing: border-box; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      display: flex;
+      margin: 0;
       height: 100vh;
       overflow: hidden;
+      color: var(--ink);
+      background: var(--bg);
+      font: 13px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       -webkit-app-region: drag;
     }
 
-    /* --- SIDEBAR --- */
-    .sidebar {
-      width: var(--sidebar-width);
-      min-width: var(--sidebar-width);
-      background: var(--sidebar-bg);
-      border-right: 1px solid var(--border);
+    button, input, select { font: inherit; }
+    button { -webkit-app-region: no-drag; }
+
+    .app {
+      height: 100vh;
+      display: grid;
+      grid-template-columns: var(--rail) minmax(0, 1fr);
+      overflow: hidden;
+    }
+
+    .rail {
+      background: var(--dark);
+      color: #f8fafc;
+      border-right: 1px solid #05070a;
       display: flex;
       flex-direction: column;
-      overflow-y: auto;
+      min-width: 0;
       -webkit-app-region: no-drag;
     }
 
-    .sidebar-header {
-      padding: 20px 16px 8px;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      font-weight: 700;
-      color: var(--text-dim);
+    .brand {
+      padding: 32px 14px 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
       -webkit-app-region: drag;
-      padding-top: 40px;
+    }
+    .brand-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      gap: 12px;
+    }
+    .brand h1 {
+      margin: 0;
+      font-size: 16px;
+      letter-spacing: 0;
+    }
+    .rail-body {
+      overflow-y: auto;
+      padding: 10px;
     }
 
-    .view-toggle {
-      -webkit-app-region: no-drag;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      color: var(--text-dim);
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: inherit;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-    .view-toggle:hover { background: var(--card-hover); color: var(--text); }
-    .view-toggle.active { background: var(--accent-dim); color: white; border-color: var(--accent-dim); }
-
-    /* Split mode hint */
-    .split-hint {
-      padding: 4px 16px 8px;
-      font-size: 10px;
-      color: var(--text-dim);
-      font-style: italic;
-    }
-
-    .workspace-section {
-      margin-bottom: 8px;
-    }
-
-    .workspace-label {
-      padding: 10px 16px 6px;
-      font-size: 13px;
+    .section-head {
+      margin: 12px 2px 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      color: #c7cdd5;
+      font-size: 11px;
       font-weight: 700;
-      color: var(--text);
+      letter-spacing: 0;
+    }
+
+    .workspace-grid {
+      display: grid;
+      gap: 7px;
+    }
+
+    .workspace-card {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: var(--dark-2);
+      color: #f8fafc;
+      border-radius: 8px;
+      padding: 9px;
+      text-align: left;
+      cursor: pointer;
+      display: grid;
+      gap: 5px;
+    }
+    .workspace-card:hover { background: var(--dark-3); }
+    .workspace-card.active {
+      border-color: var(--primary-2);
+      box-shadow: inset 3px 0 0 var(--primary-2);
+    }
+    .workspace-title {
       display: flex;
       align-items: center;
       gap: 8px;
-      user-select: none;
+      font-weight: 700;
     }
-
-    .workspace-label .dot {
+    .dot {
       width: 8px;
       height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
+      border-radius: 99px;
+      flex: 0 0 auto;
     }
+    .workspace-meta {
+      color: #aab2bd;
+      font-size: 11px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .target-switch {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      margin: 7px 0 9px;
+    }
+    .target-btn {
+      height: 30px;
+      border-radius: 7px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: var(--dark-2);
+      color: #c7cdd5;
+      cursor: pointer;
+    }
+    .target-btn.active.primary { background: var(--primary); color: white; border-color: var(--primary); }
+    .target-btn.active.compare { background: var(--compare); color: white; border-color: var(--compare); }
+    .target-btn:disabled { opacity: 0.45; cursor: default; }
 
     .account-list {
-      padding: 0 8px;
+      display: grid;
+      gap: 5px;
     }
-
+    .account-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 28px;
+      gap: 5px;
+      align-items: center;
+    }
     .account-btn {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      text-align: left;
+      min-width: 0;
+      min-height: 34px;
+      border: 1px solid transparent;
+      border-radius: 7px;
       background: transparent;
-      border: none;
-      color: var(--text-dim);
-      padding: 7px 12px 7px 28px;
-      font-size: 13px;
-      border-radius: 6px;
+      color: #d9dde3;
       cursor: pointer;
-      font-family: inherit;
-      gap: 6px;
-    }
-
-    .account-btn:hover { background: var(--card-bg); color: var(--text); }
-    .account-btn.active-left { background: var(--accent-dim); color: white; font-weight: 600; }
-    .account-btn.active-right { background: #6d28d9; color: white; font-weight: 600; }
-
-    /* Pane indicator badges on account buttons */
-    .pane-badge {
-      margin-left: auto;
-      font-size: 9px;
-      font-weight: 700;
-      padding: 1px 5px;
-      border-radius: 3px;
-      text-transform: uppercase;
-    }
-    .pane-badge.left { background: var(--accent-dim); color: white; }
-    .pane-badge.right { background: #6d28d9; color: white; }
-
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 12px 16px;
-    }
-
-    /* --- PAGES PANEL --- */
-    .pages-panel {
-      border-top: 1px solid var(--border);
-      padding: 12px 8px;
-      margin-top: auto;
-    }
-
-    .pages-title {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      font-weight: 700;
-      color: var(--text-dim);
-      padding: 4px 12px 8px;
-      display: flex;
-      align-items: center;
+      padding: 7px 8px;
+      text-align: left;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
       gap: 8px;
+      align-items: center;
     }
-
-    .pages-pane-label {
-      font-size: 9px;
-      padding: 1px 5px;
-      border-radius: 3px;
-      font-weight: 700;
+    .account-btn:hover { background: var(--dark-2); }
+    .account-btn.active-left { background: rgba(15,118,110,0.28); border-color: rgba(20,184,166,0.6); }
+    .account-btn.active-right { background: rgba(180,83,9,0.32); border-color: rgba(245,158,11,0.6); }
+    .account-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-weight: 600;
     }
+    .pane-chip {
+      font-size: 10px;
+      color: white;
+      border-radius: 4px;
+      padding: 2px 5px;
+      background: var(--primary);
+    }
+    .pane-chip.right { background: var(--compare); }
 
-    .page-btn {
-      display: block;
-      width: 100%;
-      text-align: left;
-      background: transparent;
-      border: none;
-      color: var(--text-dim);
-      padding: 6px 12px;
-      font-size: 12px;
-      border-radius: 6px;
+    .icon-btn {
+      height: 28px;
+      min-width: 28px;
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 7px;
+      background: var(--dark-2);
+      color: #c7cdd5;
       cursor: pointer;
-      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
+    .icon-btn:hover { background: var(--dark-3); color: white; }
 
-    .page-btn:hover { background: var(--card-bg); color: var(--text); }
-    .page-btn.active { color: var(--accent); }
+    .ghost-btn, .solid-btn, .danger-btn {
+      min-height: 32px;
+      border-radius: 7px;
+      padding: 0 10px;
+      cursor: pointer;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .ghost-btn:hover { background: #f7f7f5; }
+    .solid-btn {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .solid-btn:hover { background: #0d645d; }
+    .danger-btn {
+      background: #fff;
+      color: var(--danger);
+      border-color: #fecaca;
+    }
+    .danger-btn:hover { background: #fef2f2; }
 
-    /* --- MAIN CONTENT --- */
+    .add-line {
+      width: 100%;
+      border: 1px dashed rgba(255,255,255,0.2);
+      border-radius: 7px;
+      min-height: 34px;
+      background: transparent;
+      color: #aab2bd;
+      cursor: pointer;
+    }
+    .add-line:hover { color: white; background: var(--dark-2); }
+
     .main {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: minmax(0, 1fr);
+      padding-top: var(--titlebar);
+      background: #fff;
+      overflow: hidden;
       -webkit-app-region: no-drag;
     }
 
-    .panes-container {
-      flex: 1;
-      display: flex;
+    .panes {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr);
+      background: #ebe7de;
       overflow: hidden;
+    }
+    .panes.compare {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     }
 
     .pane {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      position: relative;
       min-width: 0;
-    }
-
-    .pane + .pane {
-      border-left: 2px solid var(--border);
-    }
-
-    /* Pane header — colored bar to differentiate */
-    .pane-header {
-      height: 32px;
-      display: flex;
-      align-items: center;
-      padding: 0 12px;
-      font-size: 12px;
-      font-weight: 600;
-      color: white;
-      gap: 8px;
-      flex-shrink: 0;
-    }
-
-    .pane-header .pane-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: white;
-      opacity: 0.7;
-    }
-
-    .pane-header .pane-role {
-      opacity: 0.8;
-      font-weight: 400;
-    }
-
-    /* Landing screen */
-    .landing {
-      flex: 1;
+      min-height: 0;
+      height: 100%;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      padding: 40px;
+      border-right: 1px solid var(--line);
+      background: #fff;
+      overflow: hidden;
     }
-
-    .landing h2 {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--text);
+    .pane:last-child { border-right: none; }
+    .pane.focused {
+      box-shadow: inset 0 0 0 2px var(--primary-2);
+      z-index: 1;
     }
+    .pane.right.focused { box-shadow: inset 0 0 0 2px #f59e0b; }
 
-    .landing p {
-      color: var(--text-dim);
-      font-size: 13px;
-      text-align: center;
-    }
-
-    .landing.main-landing h1 {
-      font-size: 28px;
-      font-weight: 800;
-    }
-
-    /* Webview */
-    webview {
-      flex: 1;
-      width: 100%;
-      height: 100%;
-      border: none;
-      background-color: #fff;
-    }
-
-    .hidden { display: none !important; }
-
-    /* Status bar */
-    .status-bar {
-      height: 28px;
-      background: var(--sidebar-bg);
-      border-top: 1px solid var(--border);
+    .pane-head {
+      min-height: 30px;
+      padding: 2px 6px;
+      border-bottom: 1px solid var(--line);
       display: flex;
       align-items: center;
-      padding: 0 12px;
-      font-size: 11px;
-      color: var(--text-dim);
+      gap: 6px;
+      background: #fff;
+      position: relative;
+      z-index: 20;
+      -webkit-app-region: drag;
+    }
+    .pane-head-main {
+      min-width: 0;
+      flex: 1 1 160px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .pane-accent {
+      width: 4px;
+      height: 18px;
+      border-radius: 99px;
+      background: var(--pane-color, var(--primary));
+      flex: 0 0 auto;
+    }
+    .pane-title {
+      min-width: 0;
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+    }
+    .pane-account {
+      font-weight: 750;
+      font-size: 12px;
+      line-height: 1.2;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .pane-meta {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 650;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .pane-actions {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      flex-wrap: nowrap;
+      justify-content: flex-end;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-app-region: no-drag;
+    }
+    .pane-actions::-webkit-scrollbar {
+      display: none;
+    }
+    .pane-command {
+      min-height: 24px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      padding: 0 7px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .pane-command:hover { background: #f7f7f5; border-color: #b9c2bf; }
+    .pane-command.primary {
+      border-color: rgba(20,184,166,0.45);
+      color: var(--primary);
+      font-weight: 700;
+    }
+    .pane-command.danger {
+      border-color: #fecaca;
+      color: var(--danger);
+    }
+    .pane-command.danger:hover { background: #fef2f2; }
+    .pages-menu {
+      position: relative;
+    }
+    .pages-popover {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 4px);
+      width: min(440px, calc(100vw - var(--rail) - 44px));
+      max-height: min(520px, calc(100vh - 160px));
+      overflow-y: auto;
+      display: none;
       gap: 12px;
-      flex-shrink: 0;
+      padding: 12px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      z-index: 100;
+    }
+    .pages-menu.open .pages-popover,
+    .pages-menu:focus-within .pages-popover {
+      display: grid;
+    }
+    .page-menu-group {
+      display: grid;
+      gap: 7px;
+    }
+    .page-menu-title {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 750;
+    }
+    .page-menu-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .page-menu-btn {
+      min-height: 30px;
+      border-radius: 7px;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      cursor: pointer;
+      padding: 0 10px;
+      white-space: nowrap;
+    }
+    .page-menu-btn:hover {
+      border-color: var(--primary-2);
+      color: var(--primary);
+      background: #f0fdfa;
+    }
+    .page-menu-btn.active {
+      border-color: var(--primary-2);
+      color: var(--primary);
+      background: #ecfdf5;
+      font-weight: 700;
     }
 
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--green);
-    }
-
-    /* Focus ring for split panes */
-    .pane.focused { box-shadow: inset 0 0 0 2px var(--accent); }
-
-    /* Pane header buttons */
-    .pane-header-btns {
+    .tabs {
+      min-height: 32px;
+      border-bottom: 1px solid var(--line);
+      background: #f7f5f0;
       display: flex;
       gap: 6px;
-      margin-left: auto;
-    }
-    .reset-btn {
-      background: rgba(0,0,0,0.3);
-      border: 1px solid rgba(255,255,255,0.2);
-      color: white;
-      font-size: 11px;
-      padding: 3px 10px;
-      border-radius: 4px;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
-    .reset-btn:hover { background: rgba(220,50,50,0.6); }
-    .reset-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    /* Account badge overlay (top-right of pane) */
-    .account-badge-overlay {
-      position: absolute;
-      top: 40px;
-      right: 12px;
-      background: #000000;
-      color: #ffffff;
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 700;
-      z-index: 100;
-      pointer-events: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-      line-height: 1.4;
-    }
-    .account-badge-overlay .badge-role { font-size: 13px; font-weight: 400; opacity: 0.8; }
-
-    /* Email copy icon */
-    .email-copy-btn {
-      background: none;
-      border: none;
-      color: var(--text-dim);
-      cursor: pointer;
       padding: 4px 6px;
-      border-radius: 4px;
-      line-height: 1;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
+      overflow-x: auto;
     }
-    .email-copy-btn:hover { color: var(--accent); background: rgba(56,189,248,0.1); }
-    .email-copy-btn svg { display: block; }
-
-    /* Toast notification */
-    /* API Console — sits below the panes, not overlapping */
-    .api-console {
-      height: 0;
-      background: #0d0d0d;
-      border-top: 1px solid var(--border);
+    .tabs.single {
       display: none;
-      flex-direction: column;
-      font-family: 'SF Mono', 'Menlo', 'Monaco', monospace;
-      font-size: 11px;
-      flex-shrink: 0;
     }
-    .api-console.open { display: flex; height: 180px; }
-    .api-console-header {
+    .tab {
+      height: 26px;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 7px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 8px;
+      cursor: pointer;
+      max-width: 220px;
+      white-space: nowrap;
+    }
+    .tab.active {
+      color: var(--primary);
+      border-color: var(--primary-2);
+      box-shadow: inset 0 -2px 0 var(--primary-2);
+    }
+    .tab span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tab-close {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0;
+      font-size: 14px;
+      line-height: 1;
+    }
+
+    .surface {
+      min-height: 0;
+      flex: 1 1 auto;
+      display: flex;
+      background: #fff;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+    }
+    webview {
+      flex: 1;
+      min-height: 0;
+      width: 100%;
+      height: 100%;
+      display: inline-flex;
+      border: none;
+      background: #fff;
+    }
+    .empty {
+      flex: 1;
       display: flex;
       align-items: center;
-      padding: 4px 10px;
-      background: #1a1a1a;
-      border-bottom: 1px solid #333;
-      gap: 8px;
-      flex-shrink: 0;
+      justify-content: center;
+      padding: 36px;
+      text-align: center;
+      color: var(--muted);
+      background: #f7f5f0;
     }
-    .api-console-header span { color: #aaa; font-size: 11px; font-weight: 600; }
-    .api-console-btn {
-      background: none;
-      border: 1px solid #444;
-      color: #aaa;
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 3px;
-      cursor: pointer;
+    .empty h3 {
+      margin: 0 0 8px;
+      color: var(--ink);
+      font-size: 18px;
     }
-    .api-console-btn:hover { background: #333; color: white; }
-    .api-console-btn.active { background: #c24; color: white; border-color: #c24; }
-    .api-console-spacer { margin-left: auto; }
-    .api-console-log {
-      flex: 1;
-      overflow-y: auto;
-      padding: 4px 0;
-    }
-    .api-entry {
-      padding: 3px 10px;
-      color: #ccc;
-      border-bottom: 1px solid #1a1a1a;
-      display: flex;
-      gap: 8px;
-      align-items: baseline;
-      cursor: pointer;
-      transition: background 0.1s;
-    }
-    .api-entry:hover { background: #1f1f1f; }
-    .api-entry.highlighted { background: #1a2a3a; border-left: 3px solid #4fc1ff; }
-    .api-entry .api-method { color: #4fc1ff; min-width: 40px; font-weight: 600; }
-    .api-entry .api-endpoint { color: #dcdcaa; }
-    .api-entry .api-acc { color: #888; font-size: 10px; min-width: 50px; }
-    .api-entry .api-time { color: #555; margin-left: auto; font-size: 10px; }
-    .api-entry .api-sep { color: #333; }
-    .api-console-toggle {
-      background: none;
-      border: 1px solid var(--border);
-      color: var(--text-dim);
-      font-size: 10px;
-      padding: 2px 8px;
-      border-radius: 3px;
-      cursor: pointer;
-      font-family: 'SF Mono', monospace;
-    }
-    .api-console-toggle:hover { color: var(--text); background: var(--card-bg); }
-    .api-console-toggle.active { color: #4fc1ff; border-color: #4fc1ff; }
+    .empty p { margin: 0; max-width: 360px; }
 
     .toast {
       position: fixed;
-      bottom: 48px;
       left: 50%;
-      transform: translateX(-50%) translateY(20px);
-      background: #222;
-      color: #fff;
-      padding: 10px 20px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 500;
+      bottom: 18px;
+      transform: translateX(-50%) translateY(18px);
       opacity: 0;
-      transition: opacity 0.2s, transform 0.2s;
-      z-index: 9999;
       pointer-events: none;
+      background: #111827;
+      color: #fff;
+      padding: 10px 16px;
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      transition: opacity 0.18s, transform 0.18s;
+      z-index: 2000;
     }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
 
-
-    /* CRUD modal */
     .modal-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000;
-      display: flex; align-items: center; justify-content: center;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 18, 24, 0.58);
+      -webkit-app-region: no-drag;
     }
     .modal {
-      background: var(--sidebar-bg); border: 1px solid var(--border);
-      border-radius: 12px; padding: 24px; min-width: 360px; max-width: 420px;
+      width: min(440px, calc(100vw - 32px));
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: var(--shadow);
+      padding: 20px;
     }
-    .modal h3 { font-size: 16px; font-weight: 700; margin-bottom: 16px; }
-    .modal label { display: block; font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; margin-top: 12px; }
+    .modal h3 { margin: 0 0 14px; font-size: 17px; }
+    .modal label {
+      display: block;
+      margin: 12px 0 5px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 700;
+    }
     .modal input, .modal select {
-      width: 100%; padding: 8px 10px; border-radius: 6px; border: 1px solid var(--border);
-      background: var(--card-bg); color: var(--text); font-size: 13px; font-family: inherit;
+      width: 100%;
+      height: 36px;
+      border: 1px solid var(--line);
+      border-radius: 7px;
+      padding: 0 10px;
+      background: #fff;
+      color: var(--ink);
     }
-    .modal input:focus, .modal select:focus { outline: none; border-color: var(--accent); }
-    .modal-btns { display: flex; gap: 8px; margin-top: 20px; justify-content: flex-end; }
-    .modal-btn {
-      padding: 7px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;
-      cursor: pointer; border: 1px solid var(--border); font-family: inherit;
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 18px;
     }
-    .modal-btn.primary { background: var(--accent-dim); color: white; border-color: var(--accent-dim); }
-    .modal-btn.primary:hover { background: var(--accent); }
-    .modal-btn.cancel { background: transparent; color: var(--text-dim); }
-    .modal-btn.cancel:hover { color: var(--text); background: var(--card-bg); }
-    .modal-btn.danger { background: #dc2626; color: white; border-color: #dc2626; }
-    .modal-btn.danger:hover { background: #ef4444; }
-
-    /* Workspace CRUD buttons */
-    .ws-header-actions {
-      display: flex; align-items: center; gap: 4px; margin-left: auto;
-    }
-    .ws-action-btn {
-      background: none; border: none; color: var(--text-dim); cursor: pointer;
-      padding: 2px 4px; border-radius: 4px; line-height: 1; opacity: 0;
-      transition: opacity 0.15s, color 0.15s;
-    }
-    .workspace-label:hover .ws-action-btn { opacity: 1; }
-    .ws-action-btn:hover { color: var(--text); background: var(--card-bg); }
-
-    .account-btn .acc-actions {
-      display: flex; gap: 2px; margin-left: auto; opacity: 0; transition: opacity 0.15s;
-    }
-    .account-btn:hover .acc-actions { opacity: 1; }
-    .acc-action {
-      background: none; border: none; color: var(--text-dim); cursor: pointer;
-      padding: 2px; border-radius: 3px; line-height: 1;
-    }
-    .acc-action:hover { color: var(--accent); }
-
-    .add-btn {
-      display: flex; align-items: center; gap: 6px; width: 100%; text-align: left;
-      background: transparent; border: 1px dashed var(--border); color: var(--text-dim);
-      padding: 6px 12px; font-size: 11px; border-radius: 6px; cursor: pointer;
-      font-family: inherit; margin-top: 4px;
-    }
-    .add-btn:hover { background: var(--card-bg); color: var(--text); border-color: var(--text-dim); }
-
-    .ws-collapse-btn {
-      background: none; border: none; color: var(--text-dim); cursor: pointer;
-      padding: 2px; transition: transform 0.2s;
-    }
-    .ws-collapse-btn.collapsed { transform: rotate(-90deg); }
-    .ws-collapse-btn:hover { color: var(--text); }
   </style>
 </head>
 <body>
-
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <span>Slack Launcher</span>
-      <button class="view-toggle" id="view-toggle" onclick="toggleSplitView()">Split</button>
-    </div>
-    <div class="split-hint hidden" id="split-hint">Click = Left pane, Shift+Click = Right pane</div>
-    <div id="workspace-nav"></div>
-    <div class="pages-panel hidden" id="pages-panel">
-      <div id="pages-sections"></div>
-    </div>
-  </aside>
-
-  <main class="main">
-    <div class="panes-container" id="panes-container">
-      <!-- Single or split panes rendered by JS -->
-    </div>
-    <div class="api-console" id="api-console">
-      <div class="api-console-header">
-        <span>API Console</span>
-        <button class="api-console-btn" id="api-pause-btn" onclick="toggleApiPause()">Pause</button>
-        <span class="api-console-spacer"></span>
-        <button class="api-console-btn" onclick="clearApiConsole()">Clear</button>
+  <div class="app">
+    <aside class="rail">
+      <div class="brand">
+        <div class="brand-row">
+          <h1>Slack QA Launcher</h1>
+          <button class="icon-btn" title="Add workspace" onclick="showAddWorkspace()">+</button>
+        </div>
       </div>
-      <div class="api-console-log" id="api-console-log"></div>
-    </div>
-    <div class="status-bar">
-      <span class="status-dot" id="status-dot"></span>
-      <span id="status-text">Ready</span>
-      <button class="api-console-toggle" id="api-toggle" onclick="toggleApiConsole()">API</button>
-    </div>
-  </main>
+      <div class="rail-body">
+        <div class="section-head">Workspaces</div>
+        <div class="workspace-grid" id="workspace-list"></div>
+
+        <div class="section-head">
+          <span>Open account in</span>
+          <button class="icon-btn" title="Edit selected workspace" onclick="editSelectedWorkspace()">Edit</button>
+        </div>
+        <div class="target-switch">
+          <button class="target-btn primary active" id="target-left" onclick="setFocusedPane('left')">Primary</button>
+          <button class="target-btn compare" id="target-right" onclick="enableCompare('right')">Compare</button>
+        </div>
+
+        <div class="section-head">
+          <span>Accounts</span>
+          <button class="icon-btn" title="Add account" onclick="showAddAccount(selectedWorkspaceId)">+</button>
+        </div>
+        <div class="account-list" id="account-list"></div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <section class="panes" id="panes"></section>
+    </main>
+  </div>
   <div class="toast" id="toast"></div>
 
-
 <script>
-  // ============================================================
-  // CONFIG
-  // ============================================================
-
-  const WS_COLORS = ['#34d399','#a78bfa','#fb923c','#f472b6','#fbbf24','#38bdf8','#f87171','#818cf8'];
-
-  // Generate pages dynamically based on workspace type
-  function generatePages(ws) {
-    if (ws.type === 'grid') {
-      return [
-        { name: 'Workspace Home', url: `https://app.slack.com/client/${ws.orgId}` },
-        { name: 'Org Dashboard', url: `https://app.slack.com/manage/${ws.orgId}` },
-        { name: 'Org Channels', url: `https://app.slack.com/manage/${ws.orgId}/channels` },
-        { name: 'Org Permissions', url: `https://app.slack.com/manage/${ws.orgId}/people/permissions/account-types` },
-        { name: 'Org Members', url: `https://app.slack.com/manage/${ws.orgId}/people` },
-        { name: 'Audit Logs', url: `https://app.slack.com/manage/${ws.orgId}/security/audit-logs` },
-        { name: 'SC Permissions', url: `https://app.slack.com/manage/${ws.orgId}/slack-connect/settings/channels` },
-        { name: 'WS Settings', url: `https://${ws.domain}.slack.com/admin/settings` },
-        { name: 'WS Permissions', url: `https://${ws.domain}.slack.com/admin/settings#permissions` },
-        { name: 'WS Analytics', url: `https://${ws.domain}.slack.com/admin/stats` },
-        { name: 'WS Channels', url: `https://${ws.domain}.slack.com/admin` }
-      ];
-    } else {
-      const homeUrl = ws.teamId
-        ? `https://app.slack.com/client/${ws.teamId}`
-        : `https://${ws.domain}.slack.com`;
-      return [
-        { name: 'Workspace Home', url: homeUrl },
-        { name: 'Manage Members', url: `https://${ws.domain}.slack.com/admin` },
-        { name: 'Settings', url: `https://${ws.domain}.slack.com/admin/settings` },
-        { name: 'Permissions', url: `https://${ws.domain}.slack.com/admin/settings#permissions` },
-        { name: 'SC Settings', url: `https://${ws.domain}.slack.com/admin/settings#shared_channels_permissions` },
-        { name: 'Channels', url: `https://${ws.domain}.slack.com/admin/manage-channels` },
-        { name: 'Analytics', url: `https://${ws.domain}.slack.com/admin/stats` }
-      ];
-    }
-  }
-
-  // Default workspaces (seeded on first run)
+  const CHROME_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 15_0_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/150.0.7871.47 Safari/537.36';
+  const WS_COLORS = ['#0f766e','#7c3aed','#f97316','#db2777','#ca8a04','#2563eb','#dc2626','#475569'];
   const DEFAULT_WORKSPACES = [
     {
-      id: 'testgrid', name: 'Test Grid', color: '#34d399', type: 'grid',
-      orgId: 'E06P7UNEKML', domain: 'thetestingworkspace1',
+      id: 'testgrid',
+      name: 'Testing Grid',
+      color: '#0f766e',
+      type: 'grid',
+      orgId: 'E06P7UNEKML',
+      domain: 'thetestingworkspace1',
       accounts: [
         { id: 'tg-po', role: 'Primary Owner' },
         { id: 'tg-owner', role: 'Owner' },
@@ -607,8 +622,12 @@
       ]
     },
     {
-      id: 'plus', name: 'Plus Workspace', color: '#a78bfa', type: 'standalone',
-      teamId: 'TVAD4EJ6A', domain: 'plus-workspace-group',
+      id: 'plus',
+      name: 'Plus Workspace',
+      color: '#7c3aed',
+      type: 'standalone',
+      teamId: 'TVAD4EJ6A',
+      domain: 'plus-workspace-group',
       accounts: [
         { id: 'plus-po', role: 'Primary Owner' },
         { id: 'plus-owner', role: 'Owner' },
@@ -620,78 +639,535 @@
     }
   ];
 
-  // Load workspaces from localStorage or seed with defaults
-  let WORKSPACES = (() => {
+  function loadWorkspaces() {
     try {
-      const stored = localStorage.getItem('sl_workspaces');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
-      }
+      const stored = JSON.parse(localStorage.getItem('sl_workspaces') || 'null');
+      if (Array.isArray(stored) && stored.length) return stored;
     } catch(e) {}
     return DEFAULT_WORKSPACES;
-  })();
+  }
+
+  let WORKSPACES = loadWorkspaces();
+  let selectedWorkspaceId = localStorage.getItem('sl_selected_workspace') || (WORKSPACES[0] && WORKSPACES[0].id);
+  let focusedPane = 'left';
+  let compareMode = false;
+  let tabCounter = 0;
+  let panes = { left: null, right: null };
+  let paneWebviews = { left: null, right: null };
+  let openPagesMenuSide = null;
+  const emailCache = {};
 
   function saveWorkspaces() {
     localStorage.setItem('sl_workspaces', JSON.stringify(WORKSPACES));
   }
 
-  // Collapsed state per workspace
-  let collapsedWs = (() => {
-    try { return JSON.parse(localStorage.getItem('sl_collapsed') || '{}'); } catch(e) { return {}; }
-  })();
-
-  // ============================================================
-  // STATE
-  // ============================================================
-  let splitMode = false;
-  let panes = {
-    left: null,   // { workspaceId, accountId, pageIndex }
-    right: null
-  };
-  let focusedPane = 'left';
-  const emailCache = {};  // accountId -> email (fetched from Slack API)
-
-  // Track which account is currently loaded in each webview to avoid unnecessary reloads
-  let loadedAccounts = { left: null, right: null };
-  // Pool of persistent webviews keyed by accountId — never destroyed once created
-  const webviewPool = {};
-
-  // ============================================================
-  // HELPERS
-  // ============================================================
   function getWs(wsId) { return WORKSPACES.find(w => w.id === wsId); }
-  function getAcc(ws, accId) { return ws.accounts.find(a => a.id === accId); }
+  function getAcc(ws, accId) { return ws && ws.accounts.find(a => a.id === accId); }
+  function getAccById(accId) {
+    for (const ws of WORKSPACES) {
+      const acc = ws.accounts.find(a => a.id === accId);
+      if (acc) return acc;
+    }
+    return null;
+  }
+  function getActivePane() { return panes[focusedPane] || panes.left || panes.right; }
+  function activeTab(pane) {
+    if (!pane || !pane.tabs || !pane.tabs.length) return null;
+    return pane.tabs.find(t => t.id === pane.activeTabId) || pane.tabs[0];
+  }
+  function getEmail(acc) { return (acc && acc.email) || emailCache[acc && acc.id] || ''; }
+  function paneLabel(side) { return side === 'left' ? 'Primary' : 'Compare'; }
+  function workspaceHome(ws) {
+    if (ws.teamId) return `https://app.slack.com/client/${ws.teamId}`;
+    if (ws.orgId) return `https://app.slack.com/client/${ws.orgId}`;
+    return `https://${ws.domain}.slack.com`;
+  }
+  function makeTab(title, url, pageIndex, kind) {
+    return { id: `tab-${Date.now()}-${tabCounter++}`, title, url, pageIndex, kind: kind || 'page' };
+  }
+  function pageTitleFromUrl(url) {
+    try {
+      const parsed = new URL(url);
+      if (parsed.hostname === 'mc.tinyspeck.com') {
+        return parsed.pathname.includes('audit') ? 'MC Audit Logs' : 'MC Account';
+      }
+      return parsed.pathname.split('/').filter(Boolean).pop() || parsed.hostname;
+    } catch(e) {
+      return 'Browser';
+    }
+  }
 
-  // ============================================================
-  // CRUD — MODALS
-  // ============================================================
+  function generatePages(ws) {
+    const workspacePages = [
+      { group: 'Workspace', name: 'Home', url: workspaceHome(ws), kind: 'slack' },
+      { group: 'Workspace', name: 'Members', url: `https://${ws.domain}.slack.com/admin`, kind: 'slack' },
+      { group: 'Workspace', name: 'Channels', url: `https://${ws.domain}.slack.com/admin/manage-channels`, kind: 'slack' },
+      { group: 'Workspace', name: 'Settings', url: `https://${ws.domain}.slack.com/admin/settings`, kind: 'slack' },
+      { group: 'Workspace', name: 'Permissions', url: `https://${ws.domain}.slack.com/admin/settings#permissions`, kind: 'slack' },
+      { group: 'Workspace', name: 'Slack Connect', url: `https://${ws.domain}.slack.com/admin/settings#shared_channels_permissions`, kind: 'slack' },
+      { group: 'Workspace', name: 'Analytics', url: `https://${ws.domain}.slack.com/admin/stats`, kind: 'slack' },
+      { group: 'Workspace', name: 'Access Logs', url: `https://${ws.domain}.slack.com/account/logs`, kind: 'slack' },
+      { group: 'Workspace', name: 'Exports', url: `https://${ws.domain}.slack.com/services/export`, kind: 'slack' }
+    ];
+
+    if (ws.type !== 'grid') return workspacePages;
+
+    return [
+      ...workspacePages,
+      { group: 'Enterprise Grid', name: 'Org Dashboard', url: `https://app.slack.com/manage/${ws.orgId}`, kind: 'slack' },
+      { group: 'Enterprise Grid', name: 'Org Members', url: `https://app.slack.com/manage/${ws.orgId}/people`, kind: 'slack' },
+      { group: 'Enterprise Grid', name: 'Org Channels', url: `https://app.slack.com/manage/${ws.orgId}/channels`, kind: 'slack' },
+      { group: 'Enterprise Grid', name: 'Org Permissions', url: `https://app.slack.com/manage/${ws.orgId}/people/permissions/account-types`, kind: 'slack' },
+      { group: 'Enterprise Grid', name: 'Org Audit Logs', url: `https://app.slack.com/manage/${ws.orgId}/security/audit-logs`, kind: 'slack' },
+      { group: 'Enterprise Grid', name: 'Org Exports', url: `https://app.slack.com/manage/${ws.orgId}/security/exports`, kind: 'slack' },
+      { group: 'Enterprise Grid', name: 'Slack Connect Settings', url: `https://app.slack.com/manage/${ws.orgId}/slack-connect/settings/channels`, kind: 'slack' }
+    ];
+  }
+
+  function render() {
+    renderSidebar();
+    renderPanes();
+  }
+
+  function renderSidebar() {
+    const workspaceList = document.getElementById('workspace-list');
+    workspaceList.innerHTML = '';
+
+    WORKSPACES.forEach(ws => {
+      const btn = document.createElement('button');
+      btn.className = 'workspace-card' + (ws.id === selectedWorkspaceId ? ' active' : '');
+      btn.onclick = () => selectWorkspace(ws.id);
+      btn.innerHTML = `
+        <div class="workspace-title">
+          <span class="dot" style="background:${ws.color || '#0f766e'}"></span>
+          <span>${ws.name}</span>
+        </div>
+        <div class="workspace-meta">${ws.type === 'grid' ? 'Enterprise Grid' : 'Business Plus'} - ${ws.domain}.slack.com</div>
+      `;
+      workspaceList.appendChild(btn);
+    });
+
+    document.getElementById('target-left').classList.toggle('active', focusedPane === 'left');
+    document.getElementById('target-right').classList.toggle('active', focusedPane === 'right');
+    document.getElementById('target-right').disabled = false;
+
+    const accountList = document.getElementById('account-list');
+    accountList.innerHTML = '';
+    const ws = getWs(selectedWorkspaceId);
+    if (!ws) return;
+
+    ws.accounts.forEach(acc => {
+      const row = document.createElement('div');
+      row.className = 'account-row';
+      const isLeft = panes.left && panes.left.accountId === acc.id;
+      const isRight = panes.right && panes.right.accountId === acc.id;
+
+      const btn = document.createElement('button');
+      btn.className = 'account-btn' + (isLeft ? ' active-left' : '') + (isRight ? ' active-right' : '');
+      btn.innerHTML = `
+        <span class="account-name">${acc.role}</span>
+        <span>${isLeft ? '<span class="pane-chip">P</span>' : ''}${isRight ? '<span class="pane-chip right">C</span>' : ''}</span>
+      `;
+      btn.onclick = e => {
+        const side = compareMode ? (e.shiftKey ? 'right' : focusedPane) : 'left';
+        selectAccount(ws.id, acc.id, side);
+      };
+      btn.oncontextmenu = e => {
+        e.preventDefault();
+        enableCompare('right');
+        selectAccount(ws.id, acc.id, 'right');
+      };
+      row.appendChild(btn);
+
+      const emailBtn = document.createElement('button');
+      emailBtn.className = 'icon-btn';
+      emailBtn.title = getEmail(acc) || 'Copy or save email';
+      emailBtn.textContent = '@';
+      emailBtn.onclick = e => {
+        e.stopPropagation();
+        copyOrSaveEmail(ws.id, acc.id);
+      };
+      row.appendChild(emailBtn);
+
+      accountList.appendChild(row);
+    });
+
+    const add = document.createElement('button');
+    add.className = 'add-line';
+    add.textContent = '+ Add account';
+    add.onclick = () => showAddAccount(ws.id);
+    accountList.appendChild(add);
+  }
+
+  function renderPanes() {
+    const panesEl = document.getElementById('panes');
+    panesEl.className = 'panes' + (compareMode ? ' compare' : '');
+    panesEl.innerHTML = '';
+    paneWebviews = { left: null, right: null };
+
+    panesEl.appendChild(buildPane('left'));
+    if (compareMode) panesEl.appendChild(buildPane('right'));
+
+    syncPaneWebview('left');
+    if (compareMode) syncPaneWebview('right');
+  }
+
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, ch => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    })[ch]);
+  }
+
+  function buildPagesMenu(side, state, currentTab) {
+    const ws = getWs(state.workspaceId);
+    const pages = generatePages(ws);
+    const groups = [...new Set(pages.map(page => page.group))];
+    const isOpen = openPagesMenuSide === side;
+    const groupsHtml = groups.map(group => {
+      const buttons = pages.map((page, index) => {
+        if (page.group !== group) return '';
+        const active = currentTab && currentTab.url === page.url;
+        return `<button class="page-menu-btn${active ? ' active' : ''}" type="button" data-page-index="${index}" title="${escapeHtml(page.url)}">${escapeHtml(page.name)}</button>`;
+      }).join('');
+
+      return `
+        <div class="page-menu-group">
+          <div class="page-menu-title">${escapeHtml(group)}</div>
+          <div class="page-menu-grid">${buttons}</div>
+        </div>
+      `;
+    }).join('');
+
+    return `
+      <div class="pages-menu${isOpen ? ' open' : ''}">
+        <button class="pane-command primary" type="button" data-pane-action="pages" aria-haspopup="true" aria-expanded="${isOpen ? 'true' : 'false'}">Pages</button>
+        <div class="pages-popover" role="menu" aria-label="${escapeHtml(ws.name)} page shortcuts">${groupsHtml}</div>
+      </div>
+    `;
+  }
+
+  function closePagesMenus() {
+    openPagesMenuSide = null;
+    document.querySelectorAll('.pages-menu.open').forEach(menu => {
+      menu.classList.remove('open');
+      const btn = menu.querySelector('[data-pane-action="pages"]');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  function togglePagesMenu(side, pane) {
+    const menu = pane.querySelector('.pages-menu');
+    const btn = menu && menu.querySelector('[data-pane-action="pages"]');
+    const willOpen = openPagesMenuSide !== side;
+    closePagesMenus();
+    if (!willOpen || !menu) return;
+    openPagesMenuSide = side;
+    menu.classList.add('open');
+    if (btn) btn.setAttribute('aria-expanded', 'true');
+  }
+
+  function bindPaneActions(pane, side) {
+    pane.querySelectorAll('[data-pane-action]').forEach(btn => {
+      btn.addEventListener('click', event => {
+        event.stopPropagation();
+        const action = btn.getAttribute('data-pane-action');
+        if (action === 'pages') {
+          togglePagesMenu(side, pane);
+          return;
+        }
+        closePagesMenus();
+        if (action === 'email') copyPaneEmail(side);
+        if (action === 'account') openAccount(side);
+        if (action === 'audit') openAuditLogs(side);
+        if (action === 'reset') resetAccount(side);
+        if (action === 'close') closeCompare();
+      });
+    });
+
+    const popover = pane.querySelector('.pages-popover');
+    if (popover) popover.addEventListener('click', event => event.stopPropagation());
+
+    pane.querySelectorAll('[data-page-index]').forEach(btn => {
+      btn.addEventListener('click', event => {
+        event.stopPropagation();
+        const state = panes[side];
+        if (!state) return showToast('Open an account first');
+        const ws = getWs(state.workspaceId);
+        const pages = generatePages(ws);
+        const index = Number(btn.getAttribute('data-page-index'));
+        const page = pages[index];
+        if (page) {
+          closePagesMenus();
+          openPageInPane(side, page, index);
+        }
+      });
+    });
+  }
+
+  function buildPane(side) {
+    const state = panes[side];
+    const pane = document.createElement('section');
+    pane.className = 'pane' + (focusedPane === side ? ' focused' : '') + (side === 'right' ? ' right' : '');
+    pane.onclick = e => {
+      if (e.target.tagName === 'WEBVIEW') return;
+      setFocusedPane(side);
+    };
+
+    if (!state) {
+      pane.innerHTML = `
+        <div class="pane-head">
+          <div class="pane-head-main">
+            <span class="pane-accent"></span>
+            <div class="pane-title">
+              <div class="pane-account">Open a role</div>
+              <div class="pane-meta">${paneLabel(side)}</div>
+            </div>
+          </div>
+          ${side === 'right' ? '<button class="pane-command" type="button" data-pane-action="close">Close</button>' : ''}
+        </div>
+        <div class="tabs single"></div>
+        <div class="surface">
+          <div class="empty"><div><h3>${side === 'left' ? 'Open a role' : 'Compare another role'}</h3><p>${side === 'left' ? 'Pick any account from the sidebar. Its Slack session opens here.' : 'Select a workspace and account while Compare is focused, or right-click any account.'}</p></div></div>
+        </div>
+      `;
+      bindPaneActions(pane, side);
+      return pane;
+    }
+
+    const ws = getWs(state.workspaceId);
+    const acc = getAcc(ws, state.accountId);
+    const tab = activeTab(state);
+    pane.innerHTML = `
+      <div class="pane-head">
+        <div class="pane-head-main" style="--pane-color:${escapeHtml(ws.color || '#0f766e')}">
+          <span class="pane-accent"></span>
+          <div class="pane-title">
+            <div class="pane-account">${escapeHtml(acc.role)}</div>
+            <div class="pane-meta">${escapeHtml(ws.name)} - ${paneLabel(side)}</div>
+          </div>
+        </div>
+        <div class="pane-actions">
+          ${buildPagesMenu(side, state, tab)}
+          <button class="pane-command" type="button" data-pane-action="email" title="Copy or save this role's email">Email</button>
+          <button class="pane-command" type="button" data-pane-action="account" title="Open this signed-in Slack user in MC">MC Account</button>
+          <button class="pane-command" type="button" data-pane-action="audit" title="Open MC audit logs for this workspace or org">MC Audit</button>
+          <button class="pane-command danger" type="button" data-pane-action="reset" title="Leave channels, close DMs, and delete drafts for this Slack account">Reset</button>
+          ${side === 'right' ? '<button class="pane-command" type="button" data-pane-action="close">Close</button>' : ''}
+        </div>
+      </div>
+      <div class="tabs" id="tabs-${side}"></div>
+      <div class="surface" id="surface-${side}"></div>
+    `;
+
+    const tabs = pane.querySelector(`#tabs-${side}`);
+    if (state.tabs.length <= 1) tabs.classList.add('single');
+    state.tabs.forEach(t => {
+      const tabBtn = document.createElement('button');
+      tabBtn.className = 'tab' + (t.id === state.activeTabId ? ' active' : '');
+      tabBtn.title = t.url;
+      tabBtn.innerHTML = `<span>${t.title}</span>${state.tabs.length > 1 ? '<button class="tab-close" title="Close tab">x</button>' : ''}`;
+      tabBtn.onclick = () => switchTab(side, t.id);
+      const close = tabBtn.querySelector('.tab-close');
+      if (close) {
+        close.onclick = e => {
+          e.stopPropagation();
+          closeTab(side, t.id);
+        };
+      }
+      tabs.appendChild(tabBtn);
+    });
+
+    bindPaneActions(pane, side);
+
+    if (tab && tab.kind === 'mc') {
+      const note = document.createElement('div');
+      note.className = 'empty';
+      note.style.display = 'none';
+    }
+
+    return pane;
+  }
+
+  function syncPaneWebview(side) {
+    const state = panes[side];
+    const surface = document.getElementById(`surface-${side}`);
+    if (!state || !surface) return;
+    const tab = activeTab(state);
+    if (!tab) return;
+
+    const partition = tab.kind === 'mc' ? 'persist:internal-tools' : `persist:${state.accountId}`;
+    const webview = document.createElement('webview');
+    webview.setAttribute('partition', partition);
+    webview.setAttribute('useragent', CHROME_UA);
+    if (window.electronAPI && window.electronAPI.webviewPreloadPath) {
+      webview.setAttribute('preload', window.electronAPI.webviewPreloadPath);
+    }
+    webview.setAttribute('allowpopups', '');
+    webview.setAttribute('src', tab.url);
+    webview.style.flex = '1 1 auto';
+    webview.style.width = '100%';
+    webview.style.height = '100%';
+    webview.style.minHeight = '0';
+    webview.style.display = 'inline-flex';
+
+    const normalizeSlackViewport = () => {
+      if (tab.kind === 'mc') return;
+      try {
+        if (typeof webview.setZoomFactor === 'function') webview.setZoomFactor(0.9);
+      } catch(e) {}
+      webview.executeJavaScript(`
+        window.scrollTo(0, 0);
+        if (document.scrollingElement) document.scrollingElement.scrollTop = 0;
+        void 0;
+      `).catch(() => {});
+    };
+
+    webview.addEventListener('did-navigate', e => {
+      setStatus(e.url, 'good');
+      normalizeSlackViewport();
+    });
+    webview.addEventListener('did-navigate-in-page', e => {
+      setStatus(e.url, 'good');
+    });
+    webview.addEventListener('did-fail-load', e => {
+      if (e.errorCode !== -3) setStatus(`Load failed: ${e.errorDescription}`, 'bad');
+    });
+    webview.addEventListener('dom-ready', () => {
+      normalizeSlackViewport();
+      if (tab.kind !== 'mc') fetchEmailForAccount(state.accountId);
+    });
+    webview.addEventListener('did-finish-load', normalizeSlackViewport);
+    surface.innerHTML = '';
+    surface.appendChild(webview);
+    paneWebviews[side] = webview;
+  }
+
+  function selectWorkspace(wsId) {
+    selectedWorkspaceId = wsId;
+    localStorage.setItem('sl_selected_workspace', wsId);
+    render();
+  }
+
+  function setFocusedPane(side) {
+    focusedPane = side;
+    if (side === 'right') compareMode = true;
+    render();
+  }
+
+  function enableCompare(side) {
+    compareMode = true;
+    focusedPane = side || 'right';
+    render();
+  }
+
+  function toggleCompare() {
+    if (compareMode) closeCompare();
+    else enableCompare('right');
+  }
+
+  function closeCompare() {
+    compareMode = false;
+    focusedPane = 'left';
+    panes.right = null;
+    render();
+  }
+
+  function selectAccount(wsId, accId, side) {
+    if (side === 'right') compareMode = true;
+    focusedPane = side;
+    selectedWorkspaceId = wsId;
+    localStorage.setItem('sl_selected_workspace', wsId);
+    const ws = getWs(wsId);
+    const pages = generatePages(ws);
+    const home = makeTab('Home', pages[0].url, 0, 'slack');
+    panes[side] = { workspaceId: wsId, accountId: accId, tabs: [home], activeTabId: home.id };
+    setStatus(`Opening ${ws.name}`, 'good');
+    render();
+  }
+
+  function openPageInPane(side, page, pageIndex) {
+    const state = panes[side];
+    if (!state) {
+      showToast('Open an account first');
+      return;
+    }
+    let tab = state.tabs.find(t => t.url === page.url);
+    if (!tab) {
+      tab = makeTab(page.name, page.url, pageIndex, page.kind || 'slack');
+      state.tabs.push(tab);
+    }
+    state.activeTabId = tab.id;
+    focusedPane = side;
+    render();
+  }
+
+  function openPageInFocusedPane(page, pageIndex) {
+    openPageInPane(focusedPane, page, pageIndex);
+  }
+
+  function openBrowserTab(side, title, url, kind) {
+    const state = panes[side];
+    if (!state) {
+      showToast('Open an account first');
+      return;
+    }
+    const tab = makeTab(title || pageTitleFromUrl(url), url, -1, kind || 'browser');
+    state.tabs.push(tab);
+    state.activeTabId = tab.id;
+    focusedPane = side;
+    render();
+  }
+
+  function switchTab(side, tabId) {
+    const state = panes[side];
+    if (!state) return;
+    state.activeTabId = tabId;
+    focusedPane = side;
+    render();
+  }
+
+  function closeTab(side, tabId) {
+    const state = panes[side];
+    if (!state || state.tabs.length <= 1) return;
+    const idx = state.tabs.findIndex(t => t.id === tabId);
+    if (idx < 0) return;
+    state.tabs.splice(idx, 1);
+    if (state.activeTabId === tabId) {
+      state.activeTabId = state.tabs[Math.max(0, idx - 1)].id;
+    }
+    render();
+  }
+
   function showModal(html) {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.id = 'modal-overlay';
     overlay.innerHTML = `<div class="modal">${html}</div>`;
-    overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+    overlay.onclick = e => {
+      if (e.target === overlay) closeModal();
+    };
     document.body.appendChild(overlay);
   }
   function closeModal() {
-    const m = document.getElementById('modal-overlay');
-    if (m) m.remove();
+    const overlay = document.getElementById('modal-overlay');
+    if (overlay) overlay.remove();
   }
 
-  // --- Add/Edit Workspace ---
   window.showAddWorkspace = function() {
     showModal(`
-      <h3>Add Workspace</h3>
+      <h3>Add workspace</h3>
       <label>Name</label><input id="m-ws-name" placeholder="My Workspace">
-      <label>Domain (subdomain.slack.com)</label><input id="m-ws-domain" placeholder="my-workspace">
-      <label>Type</label>
-      <select id="m-ws-type"><option value="standalone">Standalone</option><option value="grid">Enterprise Grid</option></select>
-      <label>Org ID (Grid only)</label><input id="m-ws-orgid" placeholder="E0xxxxx">
-      <label>Team ID (optional)</label><input id="m-ws-teamid" placeholder="T0xxxxx">
-      <div class="modal-btns">
-        <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
-        <button class="modal-btn primary" onclick="saveNewWorkspace()">Add</button>
+      <label>Domain</label><input id="m-ws-domain" placeholder="workspace-subdomain">
+      <label>Type</label><select id="m-ws-type"><option value="standalone">Business Plus</option><option value="grid">Enterprise Grid</option></select>
+      <label>Org ID</label><input id="m-ws-orgid" placeholder="E0xxxxx">
+      <label>Team ID</label><input id="m-ws-teamid" placeholder="T0xxxxx">
+      <div class="modal-actions">
+        <button class="ghost-btn" onclick="closeModal()">Cancel</button>
+        <button class="solid-btn" onclick="saveNewWorkspace()">Add</button>
       </div>
     `);
   };
@@ -699,34 +1175,43 @@
   window.saveNewWorkspace = function() {
     const name = document.getElementById('m-ws-name').value.trim();
     const domain = document.getElementById('m-ws-domain').value.trim();
-    const type = document.getElementById('m-ws-type').value;
-    const orgId = document.getElementById('m-ws-orgid').value.trim();
-    const teamId = document.getElementById('m-ws-teamid').value.trim();
     if (!name || !domain) return;
     const id = 'ws_' + Date.now();
-    const color = WS_COLORS[WORKSPACES.length % WS_COLORS.length];
-    WORKSPACES.push({ id, name, color, type, domain, orgId, teamId, accounts: [] });
+    WORKSPACES.push({
+      id,
+      name,
+      domain,
+      type: document.getElementById('m-ws-type').value,
+      orgId: document.getElementById('m-ws-orgid').value.trim(),
+      teamId: document.getElementById('m-ws-teamid').value.trim(),
+      color: WS_COLORS[WORKSPACES.length % WS_COLORS.length],
+      accounts: []
+    });
     saveWorkspaces();
+    selectedWorkspaceId = id;
     closeModal();
-    renderSidebar();
-    renderPages();
+    render();
+  };
+
+  window.editSelectedWorkspace = function() {
+    const ws = getWs(selectedWorkspaceId);
+    if (ws) showEditWorkspace(ws.id);
   };
 
   window.showEditWorkspace = function(wsId) {
     const ws = getWs(wsId);
     if (!ws) return;
     showModal(`
-      <h3>Edit Workspace</h3>
+      <h3>Edit workspace</h3>
       <label>Name</label><input id="m-ws-name" value="${ws.name}">
       <label>Domain</label><input id="m-ws-domain" value="${ws.domain}">
-      <label>Type</label>
-      <select id="m-ws-type"><option value="standalone" ${ws.type !== 'grid' ? 'selected' : ''}>Standalone</option><option value="grid" ${ws.type === 'grid' ? 'selected' : ''}>Enterprise Grid</option></select>
-      <label>Org ID (Grid only)</label><input id="m-ws-orgid" value="${ws.orgId || ''}">
-      <label>Team ID (optional)</label><input id="m-ws-teamid" value="${ws.teamId || ''}">
-      <div class="modal-btns">
-        <button class="modal-btn danger" onclick="deleteWorkspace('${wsId}')">Delete</button>
-        <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
-        <button class="modal-btn primary" onclick="saveEditWorkspace('${wsId}')">Save</button>
+      <label>Type</label><select id="m-ws-type"><option value="standalone" ${ws.type !== 'grid' ? 'selected' : ''}>Business Plus</option><option value="grid" ${ws.type === 'grid' ? 'selected' : ''}>Enterprise Grid</option></select>
+      <label>Org ID</label><input id="m-ws-orgid" value="${ws.orgId || ''}">
+      <label>Team ID</label><input id="m-ws-teamid" value="${ws.teamId || ''}">
+      <div class="modal-actions">
+        <button class="danger-btn" onclick="deleteWorkspace('${wsId}')">Delete</button>
+        <button class="ghost-btn" onclick="closeModal()">Cancel</button>
+        <button class="solid-btn" onclick="saveEditWorkspace('${wsId}')">Save</button>
       </div>
     `);
   };
@@ -741,27 +1226,28 @@
     ws.teamId = document.getElementById('m-ws-teamid').value.trim();
     saveWorkspaces();
     closeModal();
-    renderSidebar();
-    renderPages();
+    render();
   };
 
   window.deleteWorkspace = function(wsId) {
-    if (!confirm('Delete this workspace and all its accounts?')) return;
+    if (!confirm('Delete this workspace and all accounts?')) return;
     WORKSPACES = WORKSPACES.filter(w => w.id !== wsId);
+    selectedWorkspaceId = WORKSPACES[0] && WORKSPACES[0].id;
     saveWorkspaces();
     closeModal();
-    renderSidebar();
-    renderPages();
+    render();
   };
 
-  // --- Add/Edit Account ---
   window.showAddAccount = function(wsId) {
+    const ws = getWs(wsId);
+    if (!ws) return;
     showModal(`
-      <h3>Add Account</h3>
-      <label>Role / Name</label><input id="m-acc-role" placeholder="e.g. Primary Owner, Admin, Member">
-      <div class="modal-btns">
-        <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
-        <button class="modal-btn primary" onclick="saveNewAccount('${wsId}')">Add</button>
+      <h3>Add account</h3>
+      <label>Role or label</label><input id="m-acc-role" placeholder="Primary Owner">
+      <label>Email</label><input id="m-acc-email" placeholder="person@example.com">
+      <div class="modal-actions">
+        <button class="ghost-btn" onclick="closeModal()">Cancel</button>
+        <button class="solid-btn" onclick="saveNewAccount('${wsId}')">Add</button>
       </div>
     `);
   };
@@ -771,38 +1257,43 @@
     if (!ws) return;
     const role = document.getElementById('m-acc-role').value.trim();
     if (!role) return;
-    const id = wsId.replace('ws_','').slice(0,4) + '-' + role.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,6) + '-' + Date.now().toString(36).slice(-4);
-    ws.accounts.push({ id, role });
+    const email = document.getElementById('m-acc-email').value.trim();
+    ws.accounts.push({
+      id: `${wsId}-${role.toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,8)}-${Date.now().toString(36).slice(-4)}`,
+      role,
+      email
+    });
     saveWorkspaces();
     closeModal();
-    renderSidebar();
+    render();
   };
 
   window.showEditAccount = function(wsId, accId) {
     const ws = getWs(wsId);
-    if (!ws) return;
     const acc = getAcc(ws, accId);
     if (!acc) return;
     showModal(`
-      <h3>Edit Account</h3>
-      <label>Role / Name</label><input id="m-acc-role" value="${acc.role}">
-      <div class="modal-btns">
-        <button class="modal-btn danger" onclick="deleteAccount('${wsId}','${accId}')">Delete</button>
-        <button class="modal-btn cancel" onclick="closeModal()">Cancel</button>
-        <button class="modal-btn primary" onclick="saveEditAccount('${wsId}','${accId}')">Save</button>
+      <h3>Edit account</h3>
+      <label>Role or label</label><input id="m-acc-role" value="${acc.role}">
+      <label>Email</label><input id="m-acc-email" value="${acc.email || ''}" placeholder="person@example.com">
+      <div class="modal-actions">
+        <button class="danger-btn" onclick="deleteAccount('${wsId}','${accId}')">Delete</button>
+        <button class="ghost-btn" onclick="closeModal()">Cancel</button>
+        <button class="solid-btn" onclick="saveEditAccount('${wsId}','${accId}')">Save</button>
       </div>
     `);
   };
 
   window.saveEditAccount = function(wsId, accId) {
     const ws = getWs(wsId);
-    if (!ws) return;
     const acc = getAcc(ws, accId);
     if (!acc) return;
     acc.role = document.getElementById('m-acc-role').value.trim() || acc.role;
+    acc.email = document.getElementById('m-acc-email').value.trim();
+    if (acc.email) emailCache[acc.id] = acc.email;
     saveWorkspaces();
     closeModal();
-    renderSidebar();
+    render();
   };
 
   window.deleteAccount = function(wsId, accId) {
@@ -810,715 +1301,227 @@
     const ws = getWs(wsId);
     if (!ws) return;
     ws.accounts = ws.accounts.filter(a => a.id !== accId);
+    ['left','right'].forEach(side => {
+      if (panes[side] && panes[side].accountId === accId) panes[side] = null;
+    });
     saveWorkspaces();
     closeModal();
-    renderSidebar();
+    render();
   };
 
-  // ============================================================
-  // TOGGLE SPLIT VIEW
-  // ============================================================
-  window.toggleSplitView = function() {
-    splitMode = !splitMode;
-    document.getElementById('view-toggle').classList.toggle('active', splitMode);
-    document.getElementById('split-hint').classList.toggle('hidden', !splitMode);
-
-    if (!splitMode) {
-      panes.right = null;
-      loadedAccounts.right = null;
-    }
-
-    rebuildLayout();
-    renderSidebar();
-    renderPages();
-  };
-
-  // ============================================================
-  // REBUILD LAYOUT — only called when split mode toggles or on init
-  // ============================================================
-  function rebuildLayout() {
-    const container = document.getElementById('panes-container');
-    container.innerHTML = '';
-    // DOM was destroyed, so reset loaded tracking
-    loadedAccounts = { left: null, right: null };
-
-    if (!splitMode) {
-      container.appendChild(buildPaneShell('left'));
-    } else {
-      container.appendChild(buildPaneShell('left'));
-      container.appendChild(buildPaneShell('right'));
-    }
-
-    // Load webviews for any active panes
-    if (panes.left) loadWebviewForPane('left');
-    if (panes.right) loadWebviewForPane('right');
-
-    updateFocusRing();
-  }
-
-  function buildPaneShell(side) {
-    const pane = document.createElement('div');
-    pane.className = 'pane';
-    pane.id = `pane-${side}`;
-    pane.onclick = (e) => {
-      // Only handle clicks on the pane itself or header, not webview
-      if (e.target.tagName === 'WEBVIEW') return;
-      focusedPane = side;
-      updateFocusRing();
+  async function copyOrSaveEmail(wsId, accId) {
+    const ws = getWs(wsId);
+    const acc = getAcc(ws, accId);
+    if (!acc) return;
+    let email = getEmail(acc) || await fetchEmailForAccount(acc.id, true);
+    if (!email) {
+      const entered = prompt(`Email for ${ws.name} - ${acc.role}`);
+      if (!entered) {
+        showToast('No email saved');
+        return;
+      }
+      email = entered.trim();
+      if (!email) {
+        showToast('No email saved');
+        return;
+      }
+      acc.email = email;
+      emailCache[acc.id] = email;
+      saveWorkspaces();
       renderSidebar();
-      renderPages();
-    };
-
-    // Header
-    const header = document.createElement('div');
-    header.className = 'pane-header';
-    header.id = `pane-header-${side}`;
-    pane.appendChild(header);
-
-    // Content area (landing or webview goes here)
-    const content = document.createElement('div');
-    content.id = `pane-content-${side}`;
-    content.style.flex = '1';
-    content.style.display = 'flex';
-    content.style.flexDirection = 'column';
-    content.style.overflow = 'hidden';
-    pane.appendChild(content);
-
-    updatePaneHeader(side, pane);
-    updatePaneContent(side, content);
-
-    return pane;
-  }
-
-  // ============================================================
-  // UPDATE PANE HEADER — no webview recreation
-  // ============================================================
-  function updatePaneHeader(side, paneEl) {
-    const header = paneEl ? paneEl.querySelector('.pane-header') : document.getElementById(`pane-header-${side}`);
-    if (!header) return;
-
-    const paneState = panes[side];
-    if (!paneState) {
-      header.style.background = 'var(--card-bg)';
-      header.innerHTML = `<span style="opacity:0.6">${splitMode ? (side === 'left' ? 'Left Pane' : 'Right Pane') : ''}</span>`;
-      // Remove overlay badge if it exists
-      const existingBadge = (header.parentElement || document).querySelector(`#account-badge-${side}`);
-      if (existingBadge) existingBadge.remove();
-    } else {
-      const ws = getWs(paneState.workspaceId);
-      const acc = getAcc(ws, paneState.accountId);
-      header.style.background = ws.color;
-      header.innerHTML = `
-        <div class="pane-header-btns">
-          <button class="reset-btn" onclick="openAccount('${side}')">Account</button>
-          <button class="reset-btn" onclick="openAuditLogs('${side}')">Audit Logs</button>
-          <button class="reset-btn" onclick="resetAccount('${side}')">Reset</button>
-        </div>
-      `;
-      // Add/update the account badge overlay
-      const paneEl = header.parentElement;
-      if (paneEl) {
-        paneEl.style.position = 'relative';
-        let badge = paneEl.querySelector(`#account-badge-${side}`);
-        if (!badge) {
-          badge = document.createElement('div');
-          badge.id = `account-badge-${side}`;
-          badge.className = 'account-badge-overlay';
-          paneEl.appendChild(badge);
-        }
-        badge.innerHTML = `${ws.name}<br><span class="badge-role">${acc.role}</span>`;
+    }
+    try {
+      if (window.electronAPI && window.electronAPI.writeClipboard) {
+        await window.electronAPI.writeClipboard(email);
+      } else {
+        await navigator.clipboard.writeText(email);
       }
+      showToast('Copied ' + email);
+    } catch(e) {
+      showToast('Copy failed: ' + e.message);
     }
   }
 
-  // ============================================================
-  // UPDATE PANE CONTENT — shows landing if no account selected
-  // ============================================================
-  function updatePaneContent(side, contentEl) {
-    const content = contentEl || document.getElementById(`pane-content-${side}`);
-    if (!content) return;
-
-    const paneState = panes[side];
-    if (!paneState) {
-      content.innerHTML = '';
-      const landing = document.createElement('div');
-      landing.className = 'landing';
-      landing.innerHTML = splitMode
-        ? `<h2>${side === 'left' ? 'Left' : 'Right'} Pane</h2><p>${side === 'left' ? 'Click' : 'Shift+Click'} an account in the sidebar.</p>`
-        : `<h2>Slack Launcher</h2><p>Select a workspace and account from the sidebar.</p>`;
-      content.appendChild(landing);
-    }
-  }
-
-  // ============================================================
-  // LOAD WEBVIEW — uses pool so switching is instant
-  // ============================================================
-  function getOrCreateWebview(accId, ws) {
-    if (webviewPool[accId]) return webviewPool[accId];
-
-    const pages = generatePages(ws);
-    const url = pages[0].url;
-    const webview = document.createElement('webview');
-    webview.setAttribute('partition', `persist:${accId}`);
-    webview.setAttribute('useragent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36');
-    webview.setAttribute('allowpopups', '');
-    webview.setAttribute('src', url);
-    webview.style.flex = '1';
-    webview.style.width = '100%';
-    webview.style.height = '100%';
-    webview.style.border = 'none';
-    webview.style.display = 'none';
-
-    webview.addEventListener('did-navigate', (e) => {
-      // Find which side this webview is active on
-      const activeSide = Object.keys(loadedAccounts).find(s => loadedAccounts[s] === accId);
-      if (activeSide && focusedPane === activeSide && !document.getElementById('status-text').textContent.startsWith('Reset')) {
-        document.getElementById('status-text').textContent = e.url;
-      }
-    });
-
-    webview.addEventListener('did-fail-load', (e) => {
-      if (e.errorCode !== -3) {
-        document.getElementById('status-text').textContent = `Failed: ${e.errorDescription}`;
-        document.getElementById('status-dot').style.background = 'var(--red)';
-      }
-    });
-
-
-    // Fetch email lazily once loaded
-    webview.addEventListener('dom-ready', () => {
-      fetchEmailForAccount(accId);
-    });
-
-    // Attach API call interceptor
-    attachApiInterceptor(webview, accId);
-
-    webviewPool[accId] = webview;
-    return webview;
-  }
-
-  function loadWebviewForPane(side) {
-    const paneState = panes[side];
-    if (!paneState) return;
-
-    const content = document.getElementById(`pane-content-${side}`);
-    if (!content) return;
-
-    const ws = getWs(paneState.workspaceId);
-
-    // If same account is already loaded, don't do anything
-    if (loadedAccounts[side] === paneState.accountId) return;
-
-    // Hide the previously active webview for this pane and remove its id
-    if (loadedAccounts[side] && webviewPool[loadedAccounts[side]]) {
-      const oldWv = webviewPool[loadedAccounts[side]];
-      oldWv.style.display = 'none';
-      oldWv.removeAttribute('id');
-    }
-
-    // Get or create the webview for this account
-    const webview = getOrCreateWebview(paneState.accountId, ws);
-    webview.id = `webview-${side}`;
-    webview.style.display = 'flex';
-
-    // Append to content if not already there
-    if (!content.contains(webview)) {
-      // Remove landing if present
-      const landing = content.querySelector('.landing');
-      if (landing) landing.remove();
-      content.appendChild(webview);
-    }
-
-    loadedAccounts[side] = paneState.accountId;
-  }
-
-  // ============================================================
-  // UPDATE FOCUS RING — lightweight, no DOM rebuild
-  // ============================================================
-  function updateFocusRing() {
-    document.querySelectorAll('.pane').forEach(p => {
-      p.classList.toggle('focused', p.id === `pane-${focusedPane}`);
-    });
-  }
-
-  // ============================================================
-  // RENDER SIDEBAR
-  // ============================================================
-  // ============================================================
-  // API CONSOLE
-  // ============================================================
-  let apiConsoleOpen = false;
-  let apiPaused = false;
-
-  window.toggleApiConsole = function() {
-    apiConsoleOpen = !apiConsoleOpen;
-    document.getElementById('api-console').classList.toggle('open', apiConsoleOpen);
-    document.getElementById('api-toggle').classList.toggle('active', apiConsoleOpen);
+  window.copyPaneEmail = function(side) {
+    const state = panes[side];
+    if (!state) return showToast('Open an account first');
+    return copyOrSaveEmail(state.workspaceId, state.accountId);
+  };
+  window.copyActiveEmail = function() {
+    const state = getActivePane();
+    if (!state) return showToast('Open an account first');
+    return copyOrSaveEmail(state.workspaceId, state.accountId);
   };
 
-  window.toggleApiPause = function() {
-    apiPaused = !apiPaused;
-    const btn = document.getElementById('api-pause-btn');
-    btn.textContent = apiPaused ? 'Resume' : 'Pause';
-    btn.classList.toggle('active', apiPaused);
-  };
+  async function fetchEmailForAccount(accId, immediate) {
+    const acc = getAccById(accId);
+    if (getEmail(acc)) return getEmail(acc);
+    const webview = paneWebviews.left && panes.left && panes.left.accountId === accId
+      ? paneWebviews.left
+      : paneWebviews.right && panes.right && panes.right.accountId === accId
+        ? paneWebviews.right
+        : null;
+    if (!webview) return '';
 
-  window.clearApiConsole = function() {
-    document.getElementById('api-console-log').innerHTML = '';
-  };
-
-  function logApiCall(method, endpoint, accId) {
-    if (apiPaused) return;
-    const log = document.getElementById('api-console-log');
-    const entry = document.createElement('div');
-    entry.className = 'api-entry';
-    const time = new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits: 3 });
-    const shortAcc = accId ? accId.replace(/^(tg-|plus-)/, '') : '';
-    entry.innerHTML = `<span class="api-acc">${shortAcc}</span><span class="api-method">${method}</span><span class="api-endpoint">${endpoint}</span><span class="api-time">${time}</span>`;
-    entry.onclick = () => {
-      document.querySelectorAll('.api-entry.highlighted').forEach(el => el.classList.remove('highlighted'));
-      entry.classList.add('highlighted');
-    };
-    log.appendChild(entry);
-    // Keep max 500 entries
-    while (log.children.length > 500) log.removeChild(log.firstChild);
-    log.scrollTop = log.scrollHeight;
-  }
-
-  // Inject fetch/XHR interceptor into webviews
-  const API_INTERCEPT_SCRIPT = `
-    if (!window.__apiIntercepted) {
-      window.__apiIntercepted = true;
-      const origFetch = window.fetch;
-      window.fetch = function(url, opts) {
-        var method = (opts && opts.method) || 'GET';
-        var endpoint = (typeof url === 'string') ? url : (url.url || '');
-        if (endpoint.includes('/api/')) {
-          var short = endpoint.replace(/.*\\/api\\//, '');
-          console.log('__API_CALL__' + method + '|' + short);
+    const read = () => webview.executeJavaScript(`
+      (async function() {
+        var token = '';
+        if (window.boot_data && window.boot_data.api_token) token = window.boot_data.api_token;
+        if (!token && window.TS && window.TS.boot_data && window.TS.boot_data.api_token) token = window.TS.boot_data.api_token;
+        if (!token) {
+          var html = document.documentElement.innerHTML.substring(0, 100000);
+          var m = html.match(/"token":"(xox[csp]-[^"]+)"/);
+          if (m) token = m[1];
         }
-        return origFetch.apply(this, arguments);
-      };
-      const origXHR = XMLHttpRequest.prototype.open;
-      XMLHttpRequest.prototype.open = function(method, url) {
-        if (url && url.includes('/api/')) {
-          var short = url.replace(/.*\\/api\\//, '');
-          console.log('__API_CALL__' + method + '|' + short);
-        }
-        return origXHR.apply(this, arguments);
-      };
-    }
-  `;
-
-  function attachApiInterceptor(webview, accId) {
-    webview.addEventListener('dom-ready', () => {
-      webview.executeJavaScript(API_INTERCEPT_SCRIPT).catch(() => {});
-    });
-    webview.addEventListener('console-message', (e) => {
-      if (e.message && e.message.startsWith('__API_CALL__')) {
-        const parts = e.message.replace('__API_CALL__', '').split('|');
-        logApiCall(parts[0] || 'GET', parts[1] || '?', accId);
-      }
-    });
-  }
-
-  function showToast(msg) {
-    const toast = document.getElementById('toast');
-    toast.textContent = msg;
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2000);
-  }
-
-  function renderSidebar() {
-    const nav = document.getElementById('workspace-nav');
-    nav.innerHTML = '';
-
-    WORKSPACES.forEach(ws => {
-      const section = document.createElement('div');
-      section.className = 'workspace-section';
-
-      const isCollapsed = collapsedWs[ws.id];
-
-      const label = document.createElement('div');
-      label.className = 'workspace-label';
-      label.innerHTML = `
-        <button class="ws-collapse-btn ${isCollapsed ? 'collapsed' : ''}" onclick="toggleCollapse('${ws.id}')">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
-        </button>
-        <span class="dot" style="background:${ws.color}"></span>
-        <span style="flex:1">${ws.name}</span>
-        <span class="ws-header-actions">
-          <button class="ws-action-btn" onclick="event.stopPropagation();showEditWorkspace('${ws.id}')" title="Edit workspace">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-        </span>
-      `;
-      section.appendChild(label);
-
-      if (!isCollapsed) {
-        const list = document.createElement('div');
-        list.className = 'account-list';
-
-        ws.accounts.forEach(acc => {
-          const row = document.createElement('div');
-          row.style.display = 'flex';
-          row.style.alignItems = 'center';
-
-          const btn = document.createElement('button');
-          btn.className = 'account-btn';
-          btn.style.flex = '1';
-
-          const isLeft = panes.left && panes.left.accountId === acc.id;
-          const isRight = panes.right && panes.right.accountId === acc.id;
-          if (isLeft) btn.classList.add('active-left');
-          if (isRight) btn.classList.add('active-right');
-
-          let badgeHtml = '';
-          if (isLeft) badgeHtml += '<span class="pane-badge left">L</span>';
-          if (isRight) badgeHtml += '<span class="pane-badge right">R</span>';
-
-          btn.innerHTML = `<span>${acc.role}</span>${badgeHtml}
-            <span class="acc-actions">
-              <button class="acc-action" onclick="event.stopPropagation();showEditAccount('${ws.id}','${acc.id}')" title="Edit">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-              </button>
-            </span>`;
-
-          btn.onclick = (e) => {
-            if (e.target.closest('.acc-actions')) return;
-            const targetSide = (splitMode && e.shiftKey) ? 'right' : 'left';
-            selectAccount(ws.id, acc.id, targetSide);
-          };
-
-          btn.oncontextmenu = (e) => {
-            if (splitMode) {
-              e.preventDefault();
-              selectAccount(ws.id, acc.id, 'right');
-            }
-          };
-
-          row.appendChild(btn);
-
-          const emailBtn = document.createElement('button');
-          emailBtn.className = 'email-copy-btn';
-          const cachedEmail = emailCache[acc.id];
-          emailBtn.title = cachedEmail || 'Open account to load email';
-          emailBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>';
-          emailBtn.onclick = (e) => {
-            e.stopPropagation();
-            if (cachedEmail) {
-              navigator.clipboard.writeText(cachedEmail).then(() => {
-                showToast('Copied: ' + cachedEmail);
-              });
-            } else {
-              showToast('Open this account first to load email');
-            }
-          };
-          row.appendChild(emailBtn);
-
-          list.appendChild(row);
+        if (!token) return '';
+        var resp = await fetch('/api/users.profile.get', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'token=' + encodeURIComponent(token)
         });
-
-        // Add account button
-        const addAccBtn = document.createElement('button');
-        addAccBtn.className = 'add-btn';
-        addAccBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14"/><path d="M5 12h14"/></svg> Add account`;
-        addAccBtn.onclick = () => showAddAccount(ws.id);
-        list.appendChild(addAccBtn);
-
-        section.appendChild(list);
+        var data = await resp.json();
+        return (data && data.ok && data.profile && data.profile.email) || '';
+      })();
+    `).then(email => {
+      if (email) {
+        emailCache[accId] = email;
+        const found = getAccById(accId);
+        if (found && !found.email) {
+          found.email = email;
+          saveWorkspaces();
+        }
+        renderSidebar();
       }
+      return email || '';
+    }).catch(() => '');
 
-      const divider = document.createElement('div');
-      divider.className = 'divider';
-      section.appendChild(divider);
-
-      nav.appendChild(section);
-    });
-
-    // Add workspace button at the bottom
-    const addWsBtn = document.createElement('button');
-    addWsBtn.className = 'add-btn';
-    addWsBtn.style.margin = '4px 8px 12px';
-    addWsBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 5v14"/><path d="M5 12h14"/></svg> Add workspace`;
-    addWsBtn.onclick = showAddWorkspace;
-    nav.appendChild(addWsBtn);
+    if (immediate) return read();
+    setTimeout(read, 3500);
+    return '';
   }
 
-  window.toggleCollapse = function(wsId) {
-    collapsedWs[wsId] = !collapsedWs[wsId];
-    localStorage.setItem('sl_collapsed', JSON.stringify(collapsedWs));
-    renderSidebar();
-  };
-
-  // ============================================================
-  // RENDER PAGES PANEL
-  // ============================================================
-  function renderPages() {
-    const panel = document.getElementById('pages-panel');
-    const sections = document.getElementById('pages-sections');
-
-    const hasAny = panes.left || panes.right;
-    if (!hasAny) {
-      panel.classList.add('hidden');
-      return;
-    }
-
-    panel.classList.remove('hidden');
-    sections.innerHTML = '';
-
-    ['left', 'right'].forEach(side => {
-      const paneState = panes[side];
-      if (!paneState) return;
-
-      const ws = getWs(paneState.workspaceId);
-      if (!ws) return;
-
-      const title = document.createElement('div');
-      title.className = 'pages-title';
-      const badgeColor = side === 'left' ? 'var(--accent-dim)' : '#6d28d9';
-      const label = splitMode ? (side === 'left' ? 'L' : 'R') : '';
-      title.innerHTML = `${ws.name}${label ? ` <span class="pages-pane-label" style="background:${badgeColor};color:white">${label}</span>` : ''}`;
-      sections.appendChild(title);
-
-      const pages = generatePages(ws);
-      pages.forEach((page, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'page-btn';
-        if (paneState.pageIndex === i) btn.classList.add('active');
-        btn.textContent = page.name;
-        btn.onclick = () => navigateTo(side, page.url, i);
-        sections.appendChild(btn);
-      });
-
-      if (splitMode && side === 'left' && panes.right) {
-        const spacer = document.createElement('div');
-        spacer.style.height = '12px';
-        sections.appendChild(spacer);
-      }
-    });
-  }
-
-  // ============================================================
-  // SELECT ACCOUNT
-  // ============================================================
-  function selectAccount(wsId, accId, side) {
-    const prevAccId = panes[side] ? panes[side].accountId : null;
-    panes[side] = { workspaceId: wsId, accountId: accId, pageIndex: 0 };
-    focusedPane = side;
-
-    // Update header without touching webview
-    updatePaneHeader(side);
-
-    // Only rebuild webview if account changed
-    if (prevAccId !== accId) {
-      loadWebviewForPane(side);
-    } else {
-      // Same account, just navigate to first page
-      const ws = getWs(wsId);
-      const pages = generatePages(ws);
-      const webview = document.getElementById(`webview-${side}`);
-      if (webview) webview.loadURL(pages[0].url);
-    }
-
-    updateFocusRing();
-    renderSidebar();
-    renderPages();
-    updateStatus(side);
-  }
-
-  // ============================================================
-  // NAVIGATE TO PAGE — auto split if navigating to a non-home page in single mode
-  // ============================================================
-  function navigateTo(side, url, pageIndex) {
-    // If not in split mode and navigating to a non-home page, auto-split
-    if (!splitMode && pageIndex > 0 && panes.left) {
-      openUrlInSplit(url, pageIndex);
-      return;
-    }
-
-    if (panes[side]) {
-      panes[side].pageIndex = pageIndex;
-    }
-
-    const webview = document.getElementById(`webview-${side}`);
-    if (webview) {
-      webview.loadURL(url);
-    }
-
-    renderPages();
-  }
-
-  // ============================================================
-  // STATUS BAR
-  // ============================================================
-  function updateStatus(side) {
-    const paneState = panes[side];
-    if (!paneState) return;
-    const ws = getWs(paneState.workspaceId);
-    const acc = getAcc(ws, paneState.accountId);
-    document.getElementById('status-text').textContent = `${ws.name} - ${acc.role} (${ws.type === 'grid' ? 'Enterprise Grid' : 'Standalone'})`;
-    document.getElementById('status-dot').style.background = ws.color;
-  }
-
-  // ============================================================
-  // DECODE SLACK ID — convert encoded ID (e.g. U083Z10G67N) to raw integer
-  // ============================================================
   const SLACK_ALPHABET = '0123456789ABCDEFGHJKLMNPQRSTUVWXYZ';
   function decodeSlackId(encodedId) {
-    // Strip type prefix (U, T, C, etc. — 1 or 2 chars before the digits/letters)
-    const stripped = encodedId.replace(/^[A-Z][a-z]?/, '');
+    const stripped = String(encodedId || '').replace(/^[A-Z][a-z]?/, '');
     let result = 0;
     for (let i = 0; i < stripped.length; i += 2) {
       const hi = SLACK_ALPHABET.indexOf(stripped[i]);
       const lo = SLACK_ALPHABET.indexOf(stripped[i + 1]);
+      if (hi < 0 || lo < 0) return '';
       result = result * 1000 + (hi * 34 + lo);
     }
     return result;
   }
 
-  // ============================================================
-  // OPEN AUDIT LOGS — fetches user ID then opens MC audit logs
-  // ============================================================
+  function isSlackTab(tab) {
+    return tab && (tab.kind === 'slack' || tab.kind === 'page');
+  }
+
+  function ensureSlackTab(side, actionName) {
+    const state = panes[side];
+    if (!state) {
+      showToast('Open an account first');
+      return false;
+    }
+
+    const tab = activeTab(state);
+    if (isSlackTab(tab)) return true;
+
+    let slackTab = state.tabs.find(isSlackTab);
+    if (!slackTab) {
+      const ws = getWs(state.workspaceId);
+      slackTab = makeTab('Home', workspaceHome(ws), 0, 'slack');
+      state.tabs.unshift(slackTab);
+    }
+
+    state.activeTabId = slackTab.id;
+    focusedPane = side;
+    render();
+    setStatus(`${actionName} needs the Slack tab for this account`, 'bad');
+    showToast(`Switched ${paneLabel(side)} back to Slack. Try ${actionName} again after it loads.`);
+    return false;
+  }
+
+  window.openAuditLogs = function(side) {
+    const state = panes[side];
+    if (!state) return showToast('Open an account first');
+    const ws = getWs(state.workspaceId);
+    const encoded = ws.orgId || ws.teamId;
+    const rawId = decodeSlackId(encoded);
+    if (!rawId) return showToast('No org/team ID configured');
+    openBrowserTab(side, 'MC Audit Logs', `https://mc.tinyspeck.com/mc/external_audit_logs.php?id=${rawId}`, 'mc');
+    setStatus(`Opening MC audit logs for ${ws.name}`, 'good');
+    showToast('Opened MC Audit tab');
+  };
+
   window.openAccount = async function(side) {
-    const pane = panes[side];
-    if (!pane) { showToast('No pane active'); return; }
-    const webview = webviewPool[pane.accountId] || document.getElementById(`webview-${side}`);
-    if (!webview) { showToast('No webview found'); return; }
-    const statusText = document.getElementById('status-text');
-    statusText.textContent = 'Extracting account info...';
-
+    const state = panes[side];
+    if (!state) return showToast('Open an account first');
+    if (!ensureSlackTab(side, 'MC Account')) return;
+    const webview = paneWebviews[side];
+    if (!webview) {
+      setStatus('Slack tab is still loading', 'bad');
+      return showToast('Slack is still loading in this pane');
+    }
+    setStatus('Extracting account info...', 'good');
     try {
-      // Add timeout to prevent hanging
-      const idsPromise = webview.executeJavaScript(`
-        (function() {
-          var uid = '', tid = '';
-
-          // Method 1: boot_data global
-          if (window.boot_data) { uid = window.boot_data.user_id || ''; tid = window.boot_data.team_id || ''; }
-
-          // Method 2: TS global
-          if ((!uid || !tid) && window.TS && window.TS.boot_data) { uid = uid || window.TS.boot_data.user_id || ''; tid = tid || window.TS.boot_data.team_id || ''; }
-
-          // Method 3: Redux/localStorage
-          if (!uid || !tid) {
-            try {
-              for (var i = 0; i < localStorage.length; i++) {
-                var key = localStorage.key(i);
-                var val = localStorage.getItem(key);
-                if (val && val.length < 500000) {
-                  if (!uid) { var m = val.match(/"user_id":"(U[A-Z0-9]+)"/); if (m) uid = m[1]; }
-                  if (!tid) { var m2 = val.match(/"team_id":"(T[A-Z0-9]+)"/); if (m2) tid = m2[1]; }
-                  if (uid && tid) break;
+      const ids = await Promise.race([
+        webview.executeJavaScript(`
+          (function() {
+            var uid = '', tid = '';
+            if (window.boot_data) { uid = window.boot_data.user_id || ''; tid = window.boot_data.team_id || ''; }
+            if ((!uid || !tid) && window.TS && window.TS.boot_data) { uid = uid || window.TS.boot_data.user_id || ''; tid = tid || window.TS.boot_data.team_id || ''; }
+            if (!uid || !tid) {
+              try {
+                for (var i = 0; i < localStorage.length; i++) {
+                  var key = localStorage.key(i);
+                  var val = localStorage.getItem(key);
+                  if (val && val.length < 500000) {
+                    if (!uid) { var m = val.match(/"user_id":"(U[A-Z0-9]+)"/); if (m) uid = m[1]; }
+                    if (!tid) { var m2 = val.match(/"team_id":"(T[A-Z0-9]+)"/); if (m2) tid = m2[1]; }
+                    if (uid && tid) break;
+                  }
                 }
-              }
-            } catch(e) {}
-          }
-
-          // Method 4: URL path (for /client/TEAM_ID)
-          if (!tid) {
-            var urlMatch = location.pathname.match(/\\/client\\/([TE][A-Z0-9]+)/);
-            if (urlMatch) tid = urlMatch[1];
-          }
-
-          // Method 5: page HTML scan
-          if (!uid || !tid) {
-            var html = document.documentElement.innerHTML.substring(0, 500000);
-            if (!uid) { var m3 = html.match(/user_id['":\\\\s]+(U[A-Z0-9]+)/); if (m3) uid = m3[1]; }
-            if (!tid) { var m4 = html.match(/team_id['":\\\\s]+(T[A-Z0-9]+)/); if (m4) tid = m4[1]; }
-            if (!uid) { var m5 = html.match(/\\"user\\":\\"(U[A-Z0-9]+)\\"/); if (m5) uid = m5[1]; }
-            if (!tid) { var m6 = html.match(/\\"team\\":\\"(T[A-Z0-9]+)\\"/); if (m6) tid = m6[1]; }
-          }
-
-          // Method 6: meta tags or data attributes
-          if (!uid || !tid) {
-            var metas = document.querySelectorAll('meta[name],meta[content]');
-            for (var j = 0; j < metas.length; j++) {
-              var content = metas[j].getAttribute('content') || '';
-              if (!uid && content.match(/^U[A-Z0-9]{8,}$/)) uid = content;
-              if (!tid && content.match(/^T[A-Z0-9]{8,}$/)) tid = content;
+              } catch(e) {}
             }
-          }
-
-          return { userId: uid, teamId: tid };
-        })();
-      `);
-      const timeout = new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000));
-      const ids = await Promise.race([idsPromise, timeout]);
-
+            if (!tid) {
+              var urlMatch = location.pathname.match(/\\/client\\/([TE][A-Z0-9]+)/);
+              if (urlMatch) tid = urlMatch[1];
+            }
+            return { userId: uid, teamId: tid };
+          })();
+        `),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+      ]);
       if (!ids || !ids.userId || !ids.teamId) {
-        statusText.textContent = 'Could not get user/team ID (page not fully loaded?)';
-        showToast('Failed: IDs not found');
+        setStatus('Could not find user/team ID yet', 'bad');
+        showToast('Let Slack finish loading, then try again');
         return;
       }
-      const url = 'https://mc.tinyspeck.com/mc/user_prefs.php?id=' + ids.userId + '&team_id=' + ids.teamId;
-      statusText.textContent = 'Opening: ' + url;
-      await window.electronAPI.openExternal(url);
-      statusText.textContent = 'Opened account prefs for ' + ids.userId + ' on ' + ids.teamId;
-    } catch (e) {
-      statusText.textContent = 'Account error: ' + e.message;
-      showToast('Error: ' + e.message);
+      openBrowserTab(side, 'MC Account', `https://mc.tinyspeck.com/mc/user_prefs.php?id=${ids.userId}&team_id=${ids.teamId}`, 'mc');
+      showToast('Opened MC Account tab');
+    } catch(e) {
+      setStatus('MC account error: ' + e.message, 'bad');
+      showToast('MC Account failed: ' + e.message);
     }
   };
 
-  window.openAuditLogs = async function(side) {
-    const pane = panes[side];
-    if (!pane) return;
-
-    const ws = getWs(pane.workspaceId);
-    if (!ws) return;
-
-    const statusText = document.getElementById('status-text');
-
-    // Use orgId for Grid, teamId for standalone workspaces
-    const encodedId = ws.orgId || ws.teamId;
-    if (!encodedId) {
-      statusText.textContent = 'No org/team ID configured for this workspace';
-      return;
-    }
-
-    const rawId = decodeSlackId(encodedId);
-    const url = 'https://mc.tinyspeck.com/mc/external_audit_logs.php?id=' + rawId;
-    if (window.electronAPI && window.electronAPI.openExternal) {
-      window.electronAPI.openExternal(url);
-    } else {
-      window.open(url, '_blank');
-    }
-    statusText.textContent = 'Opened audit logs for ' + encodedId + ' (raw: ' + rawId + ')';
-  };
-
-  // ============================================================
-  // RESET ACCOUNT — leave all channels, close all DMs
-  // ============================================================
   window.resetAccount = async function(side) {
-    const pane = panes[side];
-    const webview = (pane && webviewPool[pane.accountId]) || document.getElementById(`webview-${side}`);
-    if (!webview) return;
-
-    const statusText = document.getElementById('status-text');
-    const statusDot = document.getElementById('status-dot');
-    const resetBtn = document.querySelector(`#pane-header-${side} .reset-btn`);
-    if (resetBtn) { resetBtn.disabled = true; resetBtn.textContent = 'Resetting...'; }
-
-    statusText.textContent = 'Extracting token...';
-
+    const state = panes[side];
+    if (!state) return showToast('Open an account first');
+    if (!ensureSlackTab(side, 'Reset')) return;
+    const webview = paneWebviews[side];
+    if (!webview) {
+      setStatus('Slack tab is still loading', 'bad');
+      return showToast('Slack is still loading in this pane');
+    }
+    setStatus('Extracting token...', 'good');
     try {
       const result = await webview.executeJavaScript(`
         (async () => {
-          // Extract token — try multiple locations used by modern Slack
           let token = null;
-
-          // Method 1: boot_data global
-          if (window.boot_data && window.boot_data.api_token) {
-            token = window.boot_data.api_token;
-          }
-
-          // Method 2: TS global
-          if (!token && window.TS && window.TS.boot_data && window.TS.boot_data.api_token) {
-            token = window.TS.boot_data.api_token;
-          }
-
-          // Method 3: localStorage localConfig_v2
+          if (window.boot_data && window.boot_data.api_token) token = window.boot_data.api_token;
+          if (!token && window.TS && window.TS.boot_data && window.TS.boot_data.api_token) token = window.TS.boot_data.api_token;
           if (!token) {
             try {
               const lc = localStorage.getItem('localConfig_v2');
@@ -1528,13 +1531,10 @@
               }
             } catch(e) {}
           }
-
-          // Method 4: localStorage redux store
           if (!token) {
             try {
               for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                const val = localStorage.getItem(key);
+                const val = localStorage.getItem(localStorage.key(i));
                 if (val && val.includes('xoxc-')) {
                   const m = val.match(/xoxc-[a-zA-Z0-9._-]+/);
                   if (m) { token = m[0]; break; }
@@ -1542,46 +1542,19 @@
               }
             } catch(e) {}
           }
-
-          // Method 5: script tags in page
-          if (!token) {
-            const scripts = document.querySelectorAll('script:not([src])');
-            for (const s of scripts) {
-              const m = s.textContent.match(/xoxc-[a-zA-Z0-9._-]+/);
-              if (m) { token = m[0]; break; }
-            }
-          }
-
-          // Method 6: page HTML (last resort, limited search)
-          if (!token) {
-            const html = document.documentElement.innerHTML.substring(0, 500000);
-            const m = html.match(/xoxc-[a-zA-Z0-9._-]+/);
-            if (m) token = m[0];
-          }
-
           if (!token) return { error: 'Could not find token. Make sure Slack is fully loaded.' };
-
-          // Use client.counts (works on Enterprise Grid unlike conversations.list)
           const countsForm = new FormData();
           countsForm.append('token', token);
-          const countsRes = await fetch('/api/client.counts', {
-            method: 'POST',
-            body: countsForm,
-            credentials: 'include'
-          });
+          const countsRes = await fetch('/api/client.counts', { method: 'POST', body: countsForm, credentials: 'include' });
           const countsData = await countsRes.json();
           if (!countsData.ok) return { error: 'client.counts: ' + countsData.error };
-
           const channelIds = (countsData.channels || []).map(c => c.id);
           const imIds = (countsData.ims || []).map(c => c.id);
           const mpimIds = (countsData.mpims || []).map(c => c.id);
-
           let left = 0, closed = 0, draftsDeleted = 0, skipped = 0, errors = [];
-
-          // 1. Delete all drafts
           const draftsForm = new FormData();
           draftsForm.append('token', token);
-          const draftsRes = await fetch('/api/drafts.list', {method: 'POST', body: draftsForm, credentials: 'include'});
+          const draftsRes = await fetch('/api/drafts.list', { method: 'POST', body: draftsForm, credentials: 'include' });
           const draftsData = await draftsRes.json();
           if (draftsData.ok && draftsData.drafts) {
             const now = (Date.now() / 1000).toFixed(6);
@@ -1590,172 +1563,75 @@
               df.append('token', token);
               df.append('draft_id', draft.id);
               df.append('client_last_updated_ts', now);
-              const dr = await fetch('/api/drafts.delete', {method: 'POST', body: df, credentials: 'include'});
+              const dr = await fetch('/api/drafts.delete', { method: 'POST', body: df, credentials: 'include' });
               const dd = await dr.json();
               if (dd.ok) draftsDeleted++;
             }
           }
-
-          // 2. Leave all channels
           for (const chId of channelIds) {
             const form = new FormData();
             form.append('token', token);
             form.append('channel', chId);
-            const res = await fetch('/api/conversations.leave', {
-              method: 'POST', body: form, credentials: 'include'
-            });
+            const res = await fetch('/api/conversations.leave', { method: 'POST', body: form, credentials: 'include' });
             const data = await res.json();
             if (data.ok) left++;
             else if (data.error === 'cant_leave_general' || data.error === 'last_member' || data.error === 'channel_not_found') skipped++;
             else errors.push('leave ' + chId + ': ' + data.error);
           }
-
-          // 3. Close all DMs, MPDMs, and app conversations
           for (const dmId of [...imIds, ...mpimIds]) {
             const form = new FormData();
             form.append('token', token);
             form.append('channel', dmId);
-            const res = await fetch('/api/conversations.close', {
-              method: 'POST', body: form, credentials: 'include'
-            });
+            const res = await fetch('/api/conversations.close', { method: 'POST', body: form, credentials: 'include' });
             const data = await res.json();
             if (data.ok || data.already_closed) closed++;
             else errors.push('close ' + dmId + ': ' + data.error);
           }
-
-          return { left, closed, draftsDeleted, skipped, errors, total: channelIds.length + imIds.length + mpimIds.length };
-        })()
+          return { left, closed, draftsDeleted, skipped, errors };
+        })();
       `);
-
       if (result.error) {
-        statusText.textContent = 'Reset failed: ' + result.error;
-        statusDot.style.background = 'var(--red)';
+        setStatus('Reset failed: ' + result.error, 'bad');
+        showToast(result.error);
       } else {
-        statusText.textContent = `Reset: left ${result.left} channels, closed ${result.closed} DMs/apps, deleted ${result.draftsDeleted} drafts` +
-          (result.errors.length ? ` (${result.errors.length} errors)` : '');
-        statusDot.style.background = 'var(--green)';
-        // Reload the webview to reflect changes
+        setStatus(`Reset: left ${result.left}, closed ${result.closed}, deleted ${result.draftsDeleted} drafts`, 'good');
+        showToast('Reset completed');
         webview.reload();
       }
-    } catch (e) {
-      statusText.textContent = 'Reset error: ' + e.message;
-      statusDot.style.background = 'var(--red)';
+    } catch(e) {
+      setStatus('Reset error: ' + e.message, 'bad');
+      showToast('Reset failed: ' + e.message);
     }
-
-    if (resetBtn) { resetBtn.disabled = false; resetBtn.textContent = 'Reset'; }
   };
 
-  // ============================================================
-  // FETCH EMAIL — lazily from an already-loaded webview
-  // ============================================================
-  function fetchEmailForAccount(accId) {
-    if (emailCache[accId]) return;
-    const webview = webviewPool[accId];
-    if (!webview) return;
-
-    setTimeout(() => {
-      webview.executeJavaScript(`
-        (async function() {
-          var token = '';
-          if (window.boot_data && window.boot_data.api_token) token = window.boot_data.api_token;
-          if (!token && window.TS && window.TS.boot_data && window.TS.boot_data.api_token) token = window.TS.boot_data.api_token;
-          if (!token) {
-            var html = document.documentElement.innerHTML.substring(0, 100000);
-            var m = html.match(/"token":"(xox[csp]-[^"]+)"/);
-            if (m) token = m[1];
-          }
-          if (!token) return '';
-          var resp = await fetch('/api/users.profile.get', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'token=' + encodeURIComponent(token)
-          });
-          var data = await resp.json();
-          return (data && data.ok && data.profile && data.profile.email) || '';
-        })();
-      `).then(email => {
-        if (email) { emailCache[accId] = email; renderSidebar(); }
-      }).catch(() => {});
-    }, 5000);
+  function setStatus(text, mode) {
+    if (mode === 'bad') showToast(text);
   }
 
-
-  // ============================================================
-  // OPEN IN SPLIT — handle new browser windows and page nav
-  // ============================================================
-  let browserWebview = null; // dedicated webview for the right-pane browser
-
-  function createBrowserWebview(partition, url) {
-    const webview = document.createElement('webview');
-    webview.setAttribute('partition', partition);
-    webview.setAttribute('useragent', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36');
-    webview.setAttribute('allowpopups', '');
-    webview.setAttribute('src', url);
-    webview.id = 'webview-right';
-    webview.style.flex = '1';
-    webview.style.width = '100%';
-    webview.style.height = '100%';
-    webview.style.border = 'none';
-    webview.addEventListener('did-navigate', (e) => {
-      if (focusedPane === 'right') {
-        document.getElementById('status-text').textContent = e.url;
-      }
-    });
-    return webview;
-  }
-
-  function openUrlInSplit(url, pageIndex) {
-    if (!panes.left) {
-      if (window.electronAPI) window.electronAPI.openExternal(url);
-      return;
-    }
-
-    const wasAlreadySplit = splitMode;
-
-    if (!splitMode) {
-      // Enable split mode
-      splitMode = true;
-      document.getElementById('view-toggle').classList.add('active');
-      document.getElementById('split-hint').classList.remove('hidden');
-    }
-
-    // Set right pane state (same workspace/account, different page)
-    panes.right = { ...panes.left, pageIndex: pageIndex != null ? pageIndex : -1, isBrowser: true };
-
-    if (!wasAlreadySplit) {
-      // Need to add the right pane shell to the DOM
-      const container = document.getElementById('panes-container');
-      container.appendChild(buildPaneShell('right'));
-    }
-
-    // Create a dedicated browser webview for the right pane (same partition, separate element)
-    const accId = panes.left.accountId;
-    const partition = `persist:${accId}`;
-    const content = document.getElementById('pane-content-right');
-    if (content) {
-      content.innerHTML = '';
-      browserWebview = createBrowserWebview(partition, url);
-      content.appendChild(browserWebview);
-      loadedAccounts.right = accId + '_browser';
-    }
-
-    updatePaneHeader('right');
-    updateFocusRing();
-    renderSidebar();
-    renderPages();
-    document.getElementById('status-text').textContent = url;
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 1800);
   }
 
   if (window.electronAPI && window.electronAPI.onOpenInSplit) {
-    window.electronAPI.onOpenInSplit((url) => openUrlInSplit(url));
+    window.electronAPI.onOpenInSplit(url => {
+      const side = panes[focusedPane] ? focusedPane : (panes.left ? 'left' : null);
+      if (!side) {
+        window.electronAPI.openExternal(url);
+        return;
+      }
+      openBrowserTab(side, pageTitleFromUrl(url), url, 'browser');
+    });
   }
 
-  // ============================================================
-  // INIT
-  // ============================================================
-  rebuildLayout();
-  renderSidebar();
-</script>
+  document.addEventListener('click', () => closePagesMenus());
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closePagesMenus();
+  });
 
+  render();
+</script>
 </body>
 </html>
