@@ -4,12 +4,10 @@
   "description": "Multi-account Slack launcher with isolated sessions",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "check": "node --check main.js && node --check preload.js && node --check webview-preload.js"
   },
   "devDependencies": {
-    "electron": "^33.0.0"
-  },
-  "dependencies": {
-    "better-sqlite3": "^12.10.0"
+    "electron": "^43.1.1"
   }
 }
