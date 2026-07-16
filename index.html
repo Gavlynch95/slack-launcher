@@ -99,7 +99,7 @@
   let focused = 'left';
   let panes = { left: null, right: null };
   const webviews = { left: null, right: null };
-  const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
+  const USER_AGENT = window.electronAPI.chromeUserAgent;
 
   function readStore(key, fallback) { try { const value = JSON.parse(localStorage.getItem(key)); return Array.isArray(value) && value.length ? value : structuredClone(fallback); } catch { return structuredClone(fallback); } }
   function save() { localStorage.setItem('sl_workspaces', JSON.stringify(workspaces)); }
@@ -168,7 +168,7 @@
   }
   function createWebview(side, url) {
     const pane = panes[side]; const content = document.getElementById(`content-${side}`); if (webviews[side]?.element) webviews[side].element.remove(); content.innerHTML = '';
-    const view = document.createElement('webview'); view.setAttribute('partition', `persist:slack-${pane.accountId}`); view.setAttribute('useragent', USER_AGENT); view.setAttribute('allowpopups',''); view.src = url;
+    const view = document.createElement('webview'); view.setAttribute('partition', `persist:slack-${pane.accountId}`); view.setAttribute('useragent', USER_AGENT); view.setAttribute('preload', window.electronAPI.webviewPreloadPath); view.setAttribute('allowpopups',''); view.src = url;
     view.addEventListener('dom-ready', () => captureAccountEmail(side)); view.addEventListener('did-fail-load', event => { if (event.errorCode !== -3) toast(`Slack could not load: ${event.errorDescription}`); });
     content.appendChild(view); webviews[side] = {accountId:pane.accountId, element:view};
   }

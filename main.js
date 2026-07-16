@@ -1,8 +1,23 @@
 const { app, BrowserWindow, ipcMain, session, shell } = require('electron');
 const path = require('path');
 
-const CHROME_UA = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36';
+const CHROME_VERSION = process.versions.chrome;
+const CHROME_MAJOR = CHROME_VERSION.split('.')[0];
+const CHROME_UA = `Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${CHROME_VERSION} Safari/537.36`;
 let mainWindow;
+
+function configureSlackSession(targetSession) {
+  targetSession.setUserAgent(CHROME_UA);
+  targetSession.webRequest.onBeforeSendHeaders((details, callback) => {
+    details.requestHeaders['User-Agent'] = CHROME_UA;
+    // Slack uses Client Hints as well as the legacy user agent. Electron's
+    // default hints identify it as Electron, which Slack rejects.
+    details.requestHeaders['sec-ch-ua'] = `"Google Chrome";v="${CHROME_MAJOR}", "Chromium";v="${CHROME_MAJOR}", "Not.A/Brand";v="24"`;
+    details.requestHeaders['sec-ch-ua-mobile'] = '?0';
+    details.requestHeaders['sec-ch-ua-platform'] = '"macOS"';
+    callback({ requestHeaders: details.requestHeaders });
+  });
+}
 
 function createWindow() {
   mainWindow = new BrowserWindow({
@@ -25,8 +40,8 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
-  session.defaultSession.setUserAgent(CHROME_UA);
-  app.on('session-created', (createdSession) => createdSession.setUserAgent(CHROME_UA));
+  configureSlackSession(session.defaultSession);
+  app.on('session-created', configureSlackSession);
 
   app.on('web-contents-created', (_event, contents) => {
     if (contents.getType() !== 'webview') return;
